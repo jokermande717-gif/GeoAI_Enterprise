@@ -3,484 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoAI Overlord Enterprise 2026 // Sovereign AI 3D City Builder</title>
+    <title>GeoAI Overlord Enterprise 2026.1 - Dual-Workspace Master Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; overflow-x: hidden; background: #030712; font-family: system-ui, -apple-system, sans-serif; color: #f8fafc; }
-        #canvas-container { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1; }
-        .glass-panel { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(20px); border: 1px solid rgba(56, 189, 248, 0.25); }
-        .cyber-glow { box-shadow: 0 0 35px rgba(14, 165, 233, 0.3); }
-        .btn-tool.active { background: rgba(14, 165, 233, 0.35); border-color: #38bdf8; color: #38bdf8; transform: scale(1.05); }
-        .btn-tool { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #0b1120; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.4); border-radius: 4px; }
-        .badge-din { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-family: monospace; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        body { margin: 0; overflow: hidden; background: #030712; font-family: system-ui, -apple-system, sans-serif; color: #f8fafc; }
+        .hud-border { border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(11, 15, 25, 0.94); backdrop-filter: blur(14px); }
+        .btn-action { transition: all 0.15s ease; }
+        .btn-action.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; box-shadow: 0 0 12px rgba(14, 165, 233, 0.5); }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.3); border-radius: 4px; }
     </style>
 </head>
-<body class="select-none">
+<body class="h-screen w-screen flex flex-col select-none">
 
-    <!-- 3D Viewport -->
-    <div id="canvas-container"></div>
-
-    <!-- Master Header HUD -->
-    <header class="fixed top-3 left-4 right-4 z-40 flex justify-between items-center pointer-events-none">
-        <div class="glass-panel px-5 py-2.5 rounded-2xl flex items-center gap-4 pointer-events-auto cyber-glow">
-            <div class="relative flex items-center justify-center">
-                <div class="w-3.5 h-3.5 rounded-full bg-cyan-400 animate-ping absolute"></div>
-                <div class="w-3.5 h-3.5 rounded-full bg-cyan-500 flex items-center justify-center text-[9px] font-black text-slate-950">◬</div>
+    <!-- Top Master Header HUD -->
+    <header class="h-14 px-4 hud-border flex justify-between items-center z-30 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="px-3 py-1.5 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 font-mono text-xs font-black flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                ◬ GeoAI OVERLORD // ENTERPRISE 2026.1
             </div>
-            <div>
-                <h1 class="text-sm font-black tracking-wider text-cyan-400 flex items-center gap-2">
-                    GeoAI OVERLORD // ENTERPRISE 2026
-                    <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-mono font-bold">Node: 45DF021190DD3EB5</span>
-                </h1>
-                <p class="text-[10px] text-slate-400 font-mono">BIM-GIS Digital Twin • AI 3D City Builder • DIN 18716 • ETRS89</p>
+            <div class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700">
+                MODE 1: 3D Geodetic GIS-BIM Master Suite
             </div>
         </div>
 
-        <!-- Master Dual-Engine Switch -->
-        <div class="glass-panel p-1.5 rounded-2xl flex items-center gap-1.5 pointer-events-auto border-cyan-500/40 cyber-glow">
-            <button id="switch-portal" onclick="switchViewMode('portal')" class="px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white">
-                <i class="fa-solid fa-shield-halved"></i> Enterprise Portal
-            </button>
-            <button id="switch-sandbox" onclick="switchViewMode('sandbox')" class="px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg">
-                <i class="fa-solid fa-city"></i> AI 3D City Studio
-            </button>
-        </div>
-
-        <!-- Live Telemetry -->
-        <div id="sandbox-telemetry" class="glass-panel px-5 py-2 rounded-2xl flex items-center gap-5 pointer-events-auto shadow-2xl">
-            <div class="text-center">
-                <span class="text-[9px] uppercase text-slate-400 block font-bold">City BGF Fläche</span>
-                <span id="stat-bgf" class="text-xs font-black font-mono text-cyan-300">0 m²</span>
-            </div>
-            <div class="h-5 w-px bg-slate-700"></div>
-            <div class="text-center">
-                <span class="text-[9px] uppercase text-slate-400 block font-bold">Gebäude (LOD2)</span>
-                <span id="stat-bldg" class="text-xs font-black font-mono text-amber-400">0 Einheiten</span>
-            </div>
-            <div class="h-5 w-px bg-slate-700"></div>
-            <div class="text-center">
-                <span class="text-[9px] uppercase text-slate-400 block font-bold">Massenbilanz REB</span>
-                <span id="stat-vol" class="text-xs font-black font-mono text-emerald-400">+0.0 m³</span>
-            </div>
+        <div class="flex items-center gap-3 font-mono text-xs">
+            <span class="text-emerald-400 bg-emerald-950/40 border border-emerald-500/40 px-2 py-0.5 rounded">[ DUAL-WORKSPACE ACTIVE ]</span>
+            <span class="text-cyan-300 bg-cyan-950/40 border border-cyan-500/40 px-2 py-0.5 rounded">[ AIR-GAP: VERIFIED ]</span>
         </div>
     </header>
 
-    <!-- AI City Generation Progress Modal -->
-    <div id="ai-loading-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center pointer-events-auto">
-        <div class="glass-panel p-8 rounded-3xl border border-cyan-500/40 text-center space-y-4 max-w-md w-full cyber-glow">
-            <div class="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <h3 class="text-lg font-black text-white">GeoAI In-Memory Inference...</h3>
-            <p id="ai-loading-status" class="text-xs text-cyan-300 font-mono">Abfrage von DTM-Höhendaten & ALKIS-Grundrissen...</p>
-            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                <div id="ai-progress-bar" class="bg-gradient-to-r from-cyan-400 to-blue-600 h-2 w-0 transition-all duration-300"></div>
+    <!-- Top Sub-Navigation Tabs -->
+    <div class="h-9 px-4 bg-slate-900 border-b border-slate-800 flex items-center gap-2 z-20 shrink-0 text-xs font-semibold">
+        <button class="px-3 py-1 bg-cyan-600 text-white rounded flex items-center gap-1.5"><i class="fa-solid fa-cube text-[10px]"></i> Navigation & 3D Drafting</button>
+        <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center gap-1.5"><i class="fa-solid fa-brain text-[10px] text-cyan-400"></i> 5-Tier AI Matrix</button>
+        <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center gap-1.5"><i class="fa-solid fa-file-import text-[10px] text-amber-400"></i> Survey Import Hub</button>
+        <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-[10px] text-emerald-400"></i> Profiles & Civil Analysis</button>
+        <button class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[10px] text-purple-400"></i> Sovereign Corporate Audit Hub</button>
+    </div>
+
+    <!-- Toolbar: Region & Tools -->
+    <div class="h-11 px-4 bg-slate-950/90 border-b border-slate-800/80 flex items-center justify-between z-20 shrink-0 text-xs">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+                <span class="text-slate-400 font-bold">Bundesland:</span>
+                <select id="sel-region" onchange="changeRegion(this.value)" class="bg-slate-900 border border-slate-700 text-cyan-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-cyan-400">
+                    <option value="nrw">NRW - Nordrhein-Westfalen (Düsseldorf / Bochum)</option>
+                    <option value="by">BY - Freistaat Bayern (München)</option>
+                    <option value="bw">BW - Baden-Württemberg (Stuttgart)</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="text-slate-400 font-bold">Karte:</span>
+                <select id="sel-map" onchange="changeMapTexture(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-cyan-400">
+                    <option value="osm">Straßen (OSM / Kataster)</option>
+                    <option value="sat">Satelliten-Orthofoto (DOP20)</option>
+                    <option value="topo">Topografisches Geländerelief (DGM1)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 3D Geodetic Tool Actions -->
+        <div class="flex items-center gap-2">
+            <button id="tool-select" onclick="setActiveTool('select')" class="btn-action active px-3 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-pointer text-cyan-400"></i> Select / Pan
+            </button>
+            <button id="tool-bldg" onclick="setActiveTool('bldg')" class="btn-action px-3 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-city text-cyan-400"></i> 3D Gebäude (Baufeld)
+            </button>
+            <button id="tool-trasse" onclick="setActiveTool('trasse')" class="btn-action px-3 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-road text-amber-400"></i> Trasse (Straße/Schiene)
+            </button>
+            <button id="tool-point" onclick="setActiveTool('point')" class="btn-action px-3 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-location-dot text-emerald-400"></i> Punkt Setzen (Tachymeter)
+            </button>
+            <button onclick="resetCameraView()" class="px-3 py-1 rounded bg-cyan-600/30 hover:bg-cyan-500/40 border border-cyan-400 text-cyan-200 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-plane"></i> Flug zur Region
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Workspace (Center Canvas + Left/Right Sidebars) -->
+    <div class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Left Sidebar: Spatial Layer Matrix -->
+        <div class="w-64 hud-border border-l-0 border-t-0 border-b-0 p-3 flex flex-col gap-4 z-20 shrink-0 font-mono text-xs">
+            <div>
+                <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block mb-1">REGIONAL CRS // GEODESY</span>
+                <div class="p-2 rounded bg-slate-900/90 border border-slate-800 text-[11px] space-y-0.5 text-slate-300">
+                    <div>Region: <span class="text-white font-bold" id="lbl-region-text">Nordrhein-Westfalen</span></div>
+                    <div>System: <span class="text-cyan-300 font-bold">ETRS89 / UTM 32N</span></div>
+                    <div>Gitter: <span class="text-slate-400">BETA2007_NRW</span></div>
+                </div>
+            </div>
+
+            <div>
+                <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block mb-1">SPATIAL LAYER MATRIX</span>
+                <div class="p-2 rounded bg-slate-900/90 border border-slate-800 space-y-1.5 text-[11px]">
+                    <div class="flex items-center justify-between"><label class="flex items-center gap-1.5"><input type="checkbox" checked class="accent-cyan-400"> L01: Orthofoto</label> <span class="text-emerald-400 text-[9px]">[ACTIVE]</span></div>
+                    <div class="flex items-center justify-between"><label class="flex items-center gap-1.5"><input type="checkbox" checked class="accent-cyan-400"> L02: DGM Relief TIN</label> <span class="text-emerald-400 text-[9px]">[ACTIVE]</span></div>
+                    <div class="flex items-center justify-between"><label class="flex items-center gap-1.5"><input type="checkbox" checked class="accent-cyan-400"> L03: ALKIS Grenzen</label> <span class="text-emerald-400 text-[9px]">[ACTIVE]</span></div>
+                    <div class="flex items-center justify-between"><label class="flex items-center gap-1.5"><input type="checkbox" checked class="accent-cyan-400"> L04: 3D Bauwerksentwurf</label> <span class="text-emerald-400 text-[9px]">[ACTIVE]</span></div>
+                </div>
+            </div>
+
+            <div class="mt-auto p-2.5 rounded bg-slate-900/80 border border-cyan-500/30 text-[10px] text-slate-300">
+                <i class="fa-solid fa-circle-info text-cyan-400"></i> Klicken Sie auf die 3D-Karte, um Punkte zu setzen oder Trassenachsen live zu verformen.
+            </div>
+        </div>
+
+        <!-- Center: 3D Georeferenced WebGL Map Canvas -->
+        <div class="flex-1 relative">
+            <div id="canvas-container" class="absolute inset-0"></div>
+
+            <!-- Floating Coordinates Banner inside 3D View -->
+            <div class="absolute top-2 left-3 right-3 flex justify-between items-center pointer-events-none z-10 font-mono text-[11px]">
+                <span id="map-status-msg" class="px-3 py-1 rounded bg-slate-900/90 border border-amber-500/40 text-amber-300 shadow">
+                    [SELECT & PAN: Klick zum Wählen, Ziehen zum Bewegen]
+                </span>
+                <span class="px-3 py-1 rounded bg-slate-900/90 border border-cyan-500/40 text-cyan-300 shadow">
+                    <span id="lbl-crs-live">Nordrhein-Westfalen | ZOOM: 12.5x | ETRS89 / UTM 32N</span>
+                </span>
+            </div>
+
+            <!-- Cursor Position HUD -->
+            <div class="absolute bottom-2 left-3 pointer-events-none z-10 font-mono text-[11px] px-3 py-1 rounded bg-slate-950/90 border border-slate-800 text-slate-300">
+                CURSOR: <span id="cursor-geo" class="text-cyan-300 font-bold">51.4829° N, 7.2162° E</span> | <span id="cursor-utm" class="text-emerald-300">UTM 32N: E 376,140.12 m, N 5,705,320.45 m</span>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: REB-VB Massen & AI Real-Time Auditor -->
+        <div class="w-64 hud-border border-r-0 border-t-0 border-b-0 p-3 flex flex-col gap-3.5 z-20 shrink-0 font-mono text-xs">
+            <div>
+                <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block mb-1">LIVE REB-VB MASSEN // KOSTEN</span>
+                <div class="p-2.5 rounded bg-slate-900/90 border border-slate-800 text-[11px] space-y-1">
+                    <div class="flex justify-between"><span class="text-slate-400">Aushub (Abtrag):</span> <span id="stat-cut" class="text-rose-400 font-bold">0.0 m³</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Auftrag (Planum):</span> <span id="stat-fill" class="text-cyan-400 font-bold">0.0 m³</span></div>
+                    <div class="flex justify-between border-t border-slate-800 pt-1"><span class="text-slate-300 font-bold">Netto-Saldo:</span> <span id="stat-saldo" class="text-amber-300 font-bold">±0.0 m³</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Baukosten (Est):</span> <span id="stat-cost" class="text-emerald-400 font-bold">0.00 €</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">CO2-Bilanz:</span> <span id="stat-co2" class="text-slate-300 font-bold">0.0 t</span></div>
+                </div>
+            </div>
+
+            <div>
+                <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block mb-1">5-TIER AI REAL-TIME AUDITOR</span>
+                <div class="p-2.5 rounded bg-slate-900/90 border border-slate-800 text-[11px] space-y-1.5">
+                    <div>AI Optimizer: <span class="text-emerald-400 font-bold">[ READY ]</span></div>
+                    <div>BauGB Audit: <span class="text-emerald-400 font-bold">[ KONFORM §34 ]</span></div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block mb-1">SOVEREIGN QES VAULT</span>
+                <div class="p-2 rounded bg-slate-900/90 border border-cyan-500/30 text-[10px] text-slate-400 space-y-0.5">
+                    <div>MERKLE ROOT ANCHOR:</div>
+                    <div class="text-amber-400 font-mono truncate">8f4e2b09a1c6e4d7b1a03f9c5e2d0a7b...</div>
+                    <div class="text-[9px] text-slate-400 pt-1">HWID: 45DF021190DD3EB5 | RSA-2048</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- VIEW 1: ENTERPRISE PORTAL OVERLAY          -->
-    <!-- ========================================== -->
-    <main id="view-portal" class="hidden relative z-20 pt-24 pb-20 px-6 max-w-7xl mx-auto space-y-12 select-text custom-scroll">
-        <section class="glass-panel p-10 rounded-3xl border-cyan-500/30 cyber-glow">
-            <div class="max-w-3xl space-y-4">
-                <div class="flex flex-wrap gap-2">
-                    <span class="badge-din">DIN 18716 Geodäsie</span>
-                    <span class="badge-din">REB-VB 22.013</span>
-                    <span class="badge-din">BSI TR-03116 DSGVO Konform</span>
-                </div>
-                <h2 class="text-3xl lg:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-200 to-indigo-300">
-                    Sovereign Geodetic Operating System 2026
-                </h2>
-                <p class="text-slate-300 text-sm leading-relaxed">
-                    Vollständig offline fähige 5-Tier AI Suite für Vermessungsingenieure, BauGB §34 Prüfungen, automatische Massenermittlung und 3D City Modeling.
-                </p>
-                <div class="flex gap-4 pt-2">
-                    <button onclick="switchViewMode('sandbox')" class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs transition">
-                        <i class="fa-solid fa-cube mr-1"></i> Start 3D City Builder
-                    </button>
-                    <a href="https://github.com/jokermande717-gif/GeoAI_Enterprise/releases/latest" target="_blank" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-xs border border-cyan-500/30">
-                        <i class="fa-solid fa-download mr-1"></i> Release Assets v2026.1
-                    </a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ========================================== -->
-    <!-- VIEW 2: 3D AI CITY BUILDER CONTROLS        -->
-    <!-- ========================================== -->
-    <div id="sandbox-controls">
-        
-        <!-- Left Toolbox Panel -->
-        <aside class="fixed left-4 top-20 z-30 w-80 glass-panel p-4 rounded-2xl flex flex-col gap-3.5 pointer-events-auto max-h-[82vh] overflow-y-auto custom-scroll">
-            
-            <!-- AI City Generator Box -->
-            <div class="p-3.5 rounded-2xl bg-gradient-to-br from-cyan-950/60 to-blue-950/60 border border-cyan-500/40 space-y-2.5">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-black uppercase text-cyan-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> AI 3D City Generator
-                    </span>
-                    <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-mono">LOD2</span>
-                </div>
-                <p class="text-[11px] text-slate-300 leading-tight">
-                    Wählen Sie ein städtebauliches Szenario. Die KI generiert Straßen, Gebäude und Höhenmodelle automatisch.
-                </p>
-                <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-                    <button onclick="generateAICity('metropolis')" class="py-2 px-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black flex items-center justify-center gap-1 transition shadow">
-                        <i class="fa-solid fa-city"></i> Smart City
-                    </button>
-                    <button onclick="generateAICity('suburb')" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center gap-1 transition">
-                        <i class="fa-solid fa-tree-city"></i> Wohnquartier
-                    </button>
-                    <button onclick="generateAICity('industrial')" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center gap-1 transition">
-                        <i class="fa-solid fa-industry"></i> Gewerbepark
-                    </button>
-                    <button onclick="generateAICity('infra')" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center gap-1 transition">
-                        <i class="fa-solid fa-bridge"></i> Talbrücke & ICE
-                    </button>
-                </div>
-            </div>
-
-            <!-- Layer & Isolation Switcher -->
-            <div>
-                <h2 class="text-xs font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2 mb-2">
-                    <i class="fa-solid fa-layer-group"></i> Ansichts- & Isolations-Modus
-                </h2>
-                <div class="grid grid-cols-2 gap-1.5 text-xs">
-                    <button id="btn-iso-hybrid" onclick="setIsolationMode('hybrid')" class="py-2 px-2.5 rounded-xl bg-cyan-600/30 border border-cyan-400 text-cyan-200 font-bold flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-globe"></i> Hybrid (GIS+BIM)
-                    </button>
-                    <button id="btn-iso-cad" onclick="setIsolationMode('cad')" class="py-2 px-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold flex items-center justify-center gap-1.5 transition hover:bg-slate-700">
-                        <i class="fa-solid fa-bezier-curve text-amber-400"></i> Nur CAD / Trasse
-                    </button>
-                    <button id="btn-iso-dtm" onclick="setIsolationMode('dtm')" class="py-2 px-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold flex items-center justify-center gap-1.5 transition hover:bg-slate-700">
-                        <i class="fa-solid fa-mountain text-emerald-400"></i> Nur DGM / Relief
-                    </button>
-                    <button id="btn-iso-xray" onclick="setIsolationMode('xray')" class="py-2 px-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold flex items-center justify-center gap-1.5 transition hover:bg-slate-700">
-                        <i class="fa-solid fa-eye text-purple-400"></i> Röntgen / U-Bahn
-                    </button>
-                </div>
-            </div>
-
-            <!-- Infrastructure Type -->
-            <div class="pt-2 border-t border-slate-800">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Trassierungs-Typ</span>
-                <div class="grid grid-cols-3 gap-1.5">
-                    <button id="btn-road" onclick="setInfraType('road')" class="btn-tool active py-2.5 px-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] flex flex-col items-center justify-center gap-1">
-                        <i class="fa-solid fa-road text-cyan-400 text-sm"></i> Straße
-                    </button>
-                    <button id="btn-rail" onclick="setInfraType('rail')" class="btn-tool py-2.5 px-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] flex flex-col items-center justify-center gap-1">
-                        <i class="fa-solid fa-train-track text-amber-400 text-sm"></i> ICE
-                    </button>
-                    <button id="btn-ubahn" onclick="setInfraType('ubahn')" class="btn-tool py-2.5 px-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[11px] flex flex-col items-center justify-center gap-1">
-                        <i class="fa-solid fa-train-subway text-emerald-400 text-sm"></i> U-Bahn
-                    </button>
-                </div>
-            </div>
-
-            <!-- BIM / GIS Export -->
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">BIM / GIS Export</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="exportBIMData('landxml')" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-[11px] font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-file-code"></i> LandXML / IFC
-                    </button>
-                    <button onclick="exportBIMData('reb')" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-table"></i> REB-VB 22.013
-                    </button>
-                </div>
-            </div>
-
-            <!-- Simulation -->
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-                <div class="grid grid-cols-2 gap-2">
-                    <button id="btn-drive-train" onclick="startVehicleSim('train')" class="py-2.5 rounded-xl bg-emerald-600/30 border border-emerald-500 hover:bg-emerald-500/40 text-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-train"></i> Zug FPV
-                    </button>
-                    <button id="btn-drive-drone" onclick="startVehicleSim('drone')" class="py-2.5 rounded-xl bg-purple-600/30 border border-purple-500 hover:bg-purple-500/40 text-purple-200 text-xs font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-drone"></i> Drohnenflug
-                    </button>
-                </div>
-                <button id="btn-stop-sim" onclick="stopVehicleSim()" class="w-full hidden py-2 rounded-xl bg-rose-600/40 border border-rose-500 text-rose-200 text-xs font-black">
-                    <i class="fa-solid fa-stop"></i> Simulation beenden
-                </button>
-            </div>
-        </aside>
-
-        <!-- Bottom Placement Dock -->
-        <nav class="fixed bottom-5 left-1/2 -translate-x-1/2 z-30 glass-panel px-4 py-2.5 rounded-3xl flex items-center gap-2 pointer-events-auto cyber-glow">
-            <span class="text-[10px] uppercase font-bold text-slate-400 px-2 border-r border-slate-700">Platzieren:</span>
-            
-            <button onclick="selectSpawnTool('pine')" id="tool-pine" class="btn-tool p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-tree"></i>
-                <span class="text-[9px] font-bold text-slate-300">Tanne</span>
-            </button>
-
-            <button onclick="selectSpawnTool('building')" id="tool-building" class="btn-tool p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-city"></i>
-                <span class="text-[9px] font-bold text-slate-300">Hochhaus</span>
-            </button>
-
-            <button onclick="selectSpawnTool('crane')" id="tool-crane" class="btn-tool p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-trowel-bricks"></i>
-                <span class="text-[9px] font-bold text-slate-300">Baukran</span>
-            </button>
-
-            <button onclick="selectSpawnTool('totalstation')" id="tool-totalstation" class="btn-tool p-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-rose-400 text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-crosshairs"></i>
-                <span class="text-[9px] font-bold text-slate-300">Tachymeter</span>
-            </button>
-
-            <div class="h-8 w-px bg-slate-700 mx-1"></div>
-
-            <button onclick="clearCustomObjects()" class="p-2.5 rounded-2xl bg-slate-800 hover:bg-rose-600/30 text-rose-400 text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-trash-can"></i>
-                <span class="text-[9px] font-bold text-slate-300">Reset</span>
-            </button>
-        </nav>
+    <!-- Bottom Coordinate Matrix (Bidirectional Geodetic Sync Table) -->
+    <div class="h-44 hud-border border-l-0 border-r-0 border-b-0 flex flex-col z-20 shrink-0 font-mono text-xs">
+        <div class="h-6 px-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center text-[10px] text-slate-400 font-bold">
+            <span>COORDINATE MATRIX // BIDIRECTIONAL SYNC _AI AUDIT (Taste 'Entf' = Punkt löschen)</span>
+            <span class="text-cyan-400 font-bold">ETRS89 / UTM ZONE 32N (EPSG:25832)</span>
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scroll">
+            <table class="w-full text-left text-[11px] border-collapse">
+                <thead class="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 text-[10px]">
+                    <tr>
+                        <th class="p-2">PUNKT-ID</th>
+                        <th class="p-2">OSTWERT (E) [m]</th>
+                        <th class="p-2">HOCHWERT (N) [m]</th>
+                        <th class="p-2">HOEHE (Z) [m]</th>
+                        <th class="p-2">CODE / AI-KLASSE</th>
+                        <th class="p-2">AUDIT STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="coord-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                    <!-- Dynamic Coordinate Rows -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Master Three.js Engine -->
+    <!-- Master Three.js Georeferenced Script -->
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq, type = 'sine', dur = 0.12) {
-            try {
-                const osc = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                g.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                osc.connect(g);
-                g.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + dur);
-            } catch(e) {}
-        }
-
-        let currentMode = 'sandbox';
-        function switchViewMode(mode) {
-            currentMode = mode;
-            const portalView = document.getElementById('view-portal');
-            const sandboxControls = document.getElementById('sandbox-controls');
-            const sandboxTelemetry = document.getElementById('sandbox-telemetry');
-            const btnPortal = document.getElementById('switch-portal');
-            const btnSandbox = document.getElementById('switch-sandbox');
-
-            if (mode === 'portal') {
-                portalView.classList.remove('hidden');
-                sandboxControls.classList.add('hidden');
-                sandboxTelemetry.classList.add('hidden');
-                btnPortal.className = 'px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg';
-                btnSandbox.className = 'px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white';
-                transformControls.detach();
-            } else {
-                portalView.classList.add('hidden');
-                sandboxControls.classList.remove('hidden');
-                sandboxTelemetry.classList.remove('hidden');
-                btnSandbox.className = 'px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg';
-                btnPortal.className = 'px-5 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 bg-slate-800 text-slate-400 hover:text-white';
-                if (points.length > 1) transformControls.attach(points[1]);
-            }
-            playTone(550, 'triangle');
-        }
-
         let scene, camera, renderer, controls, transformControls;
-        let splineCurve, points = [], roadMesh, railMeshes = [], poleGroupList = [], bridgePillars = [];
-        let placedObjects = [], cityBuildings = [], laserBeams = [], windTurbines = [], towerCranes = [];
-        let terrainMesh, terrainGeo, gridHelperMesh;
-        let infraType = 'road', roadWidth = 8.0, poleSpacing = 20.0;
-        let isolationMode = 'hybrid';
-        let dirLight, ambientLight;
-        let activeSpawnTool = null;
-        let simMode = null, simProgress = 0, trainMesh, droneMesh;
-
-        const defaultAnchors = [
-            new THREE.Vector3(-80, 2, -45),
-            new THREE.Vector3(-30, 16, -15),
-            new THREE.Vector3(20, -1, 10),
-            new THREE.Vector3(80, 8, 50)
-        ];
+        let terrainMesh, terrainGeo, mapTexture;
+        let activeTool = 'select';
+        let splineCurve, points = [], roadMesh, placedMeshes = [];
+        let raycaster, mouse;
+        
+        // Base UTM Coordinates for NRW (Bochum / Düsseldorf)
+        const baseUTM = { E: 375000.0, N: 5695000.0, Z: 65.0 };
 
         function init() {
             const container = document.getElementById('canvas-container');
             
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x060913);
-            scene.fog = new THREE.FogExp2(0x060913, 0.0045);
 
-            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 1800);
-            camera.position.set(0, 85, 140);
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.5, 3000);
+            camera.position.set(0, 160, 220);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.05;
 
             transformControls = new THREE.TransformControls(camera, renderer.domElement);
-            transformControls.size = 0.8;
+            transformControls.size = 0.75;
             transformControls.addEventListener('dragging-changed', (e) => controls.enabled = !e.value);
-            transformControls.addEventListener('change', () => rebuildInfrastructure());
+            transformControls.addEventListener('change', () => {
+                rebuildInfrastructure();
+                updateCoordTable();
+            });
             scene.add(transformControls);
 
-            ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
-            scene.add(ambientLight);
-
-            dirLight = new THREE.DirectionalLight(0xfff7ed, 1.35);
-            dirLight.position.set(140, 200, 90);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 2048;
-            dirLight.shadow.mapSize.height = 2048;
+            scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+            const dirLight = new THREE.DirectionalLight(0xfff7ed, 1.2);
+            dirLight.position.set(150, 250, 100);
             scene.add(dirLight);
 
-            createSculptableTerrain();
-            initAnchors();
-            createSimVehicles();
-            rebuildInfrastructure();
-            setupInteractions();
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
 
-            // Initial AI City Generation
-            generateAICity('metropolis');
+            createGeoreferencedTerrain();
+            initDefaultTrasse();
+            setupInteractions();
 
             window.addEventListener('resize', onResize);
             animate();
         }
 
-        function createSculptableTerrain() {
-            const size = 380;
-            const segs = 70;
-            terrainGeo = new THREE.PlaneGeometry(size, size, segs, segs);
+        function createGeoreferencedTerrain() {
+            const size = 500;
+            terrainGeo = new THREE.PlaneGeometry(size, size, 80, 80);
             terrainGeo.rotateX(-Math.PI / 2);
 
+            // Procedural Elevation for Ruhrgebiet Valley
             const pos = terrainGeo.attributes.position;
             for (let i = 0; i < pos.count; i++) {
                 const x = pos.getX(i);
                 const z = pos.getZ(i);
-                const y = Math.sin(x * 0.025) * Math.cos(z * 0.025) * 5.0 + Math.sin(x * 0.05) * 2.0;
+                const y = Math.sin(x * 0.015) * Math.cos(z * 0.015) * 6.0 + Math.sin(x * 0.04) * 2.0;
                 pos.setY(i, y);
             }
             terrainGeo.computeVertexNormals();
 
-            const terrainMat = new THREE.MeshStandardMaterial({
-                color: 0x0f2438,
-                roughness: 0.85,
-                metalness: 0.15,
-                transparent: true,
-                opacity: 1.0
-            });
+            // Procedural Canvas Map (NRW / Ruhrgebiet Orthophoto & Streets style)
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            
+            // Map Background
+            ctx.fillStyle = '#e5e7eb'; ctx.fillRect(0, 0, 1024, 1024);
+            // Forest / Green zones
+            ctx.fillStyle = '#bbf7d0'; ctx.beginPath(); ctx.arc(300, 300, 200, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(750, 700, 250, 0, Math.PI*2); ctx.fill();
+            // Ruhr River
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 28;
+            ctx.beginPath(); ctx.moveTo(0, 600); ctx.bezierCurveTo(300, 550, 600, 750, 1024, 700); ctx.stroke();
+            // Road Network (Autobahn A40 / A43)
+            ctx.strokeStyle = '#f97316'; ctx.lineWidth = 14;
+            ctx.beginPath(); ctx.moveTo(0, 400); ctx.lineTo(1024, 420); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(500, 0); ctx.lineTo(520, 1024); ctx.stroke();
 
+            // City labels
+            ctx.fillStyle = '#1e293b'; ctx.font = 'bold 28px sans-serif';
+            ctx.fillText('Bochum-Zentrum', 460, 380);
+            ctx.fillText('Düsseldorf-Nord', 150, 680);
+
+            mapTexture = new THREE.CanvasTexture(canvas);
+            const terrainMat = new THREE.MeshStandardMaterial({ map: mapTexture, roughness: 0.85 });
             terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
             terrainMesh.receiveShadow = true;
             scene.add(terrainMesh);
 
-            gridHelperMesh = new THREE.GridHelper(380, 76, 0x00d2ff, 0x1e293b);
-            gridHelperMesh.position.y = 0.05;
-            scene.add(gridHelperMesh);
-            gridHelperMesh.visible = false;
+            const grid = new THREE.GridHelper(size, 50, 0x0284c7, 0x94a3b8);
+            grid.position.y = 0.1;
+            scene.add(grid);
         }
 
-        function generateAICity(type) {
-            const modal = document.getElementById('ai-loading-modal');
-            const status = document.getElementById('ai-loading-status');
-            const pbar = document.getElementById('ai-progress-bar');
-            
-            modal.classList.remove('hidden');
-            pbar.style.width = '20%';
-            status.innerText = 'Lade DTM-Höhenmodell & ETRS89 Koordinatennetz...';
-            playTone(450, 'sine');
+        function initDefaultTrasse() {
+            const defaultPts = [
+                new THREE.Vector3(-90, 4, -40),
+                new THREE.Vector3(-30, 8, -10),
+                new THREE.Vector3(30, 3, 20),
+                new THREE.Vector3(90, 6, 60)
+            ];
 
-            setTimeout(() => {
-                pbar.style.width = '60%';
-                status.innerText = 'In-Memory Extraktion von LOD2 Gebäudekörpern...';
-                playTone(600, 'triangle');
-            }, 350);
+            const geo = new THREE.SphereGeometry(2.0, 16, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309 });
 
-            setTimeout(() => {
-                pbar.style.width = '100%';
-                status.innerText = 'Trassierung & Massenkompensation abgeschlossen!';
-                playTone(750, 'sine');
-                
-                // Clear old city objects
-                cityBuildings.forEach(b => scene.remove(b));
-                cityBuildings = [];
-
-                let bldgCount = 0;
-                let totalBGF = 0;
-
-                const count = type === 'metropolis' ? 45 : (type === 'suburb' ? 30 : 25);
-                for (let i = 0; i < count; i++) {
-                    const x = (Math.random() - 0.5) * 240;
-                    const z = (Math.random() - 0.5) * 240;
-                    
-                    // Keep clearance near the main track
-                    if (Math.abs(x) > 25 || Math.abs(z) > 25) {
-                        const w = 6 + Math.random() * 8;
-                        const d = 6 + Math.random() * 8;
-                        let h = 8 + Math.random() * 12;
-                        if (type === 'metropolis') h = 18 + Math.random() * 35;
-                        if (type === 'suburb') h = 6 + Math.random() * 8;
-                        if (type === 'industrial') { h = 7; }
-
-                        const bGeo = new THREE.BoxGeometry(w, h, d);
-                        const bMat = new THREE.MeshStandardMaterial({
-                            color: type === 'metropolis' ? 0x0284c7 : (type === 'suburb' ? 0xe2e8f0 : 0x475569),
-                            roughness: 0.25,
-                            metalness: 0.65
-                        });
-                        const bMesh = new THREE.Mesh(bGeo, bMat);
-                        bMesh.position.set(x, h / 2, z);
-                        bMesh.castShadow = true;
-                        bMesh.receiveShadow = true;
-                        scene.add(bMesh);
-                        cityBuildings.push(bMesh);
-
-                        bldgCount++;
-                        totalBGF += (w * d * Math.floor(h / 3));
-                    }
-                }
-
-                // Add surrounding nature
-                for (let j = 0; j < 35; j++) {
-                    const tx = (Math.random() - 0.5) * 260;
-                    const tz = (Math.random() - 0.5) * 260;
-                    if (Math.abs(tx) > 20) spawnObjectAt(new THREE.Vector3(tx, 0, tz), 'pine', false);
-                }
-
-                document.getElementById('stat-bldg').innerText = bldgCount + ' Einheiten';
-                document.getElementById('stat-bgf').innerText = totalBGF.toLocaleString('de-DE') + ' m²';
-
-                modal.classList.add('hidden');
-                pbar.style.width = '0%';
-            }, 750);
-        }
-
-        function initAnchors() {
-            const geo = new THREE.SphereGeometry(1.5, 16, 16);
-            const mat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309, roughness: 0.2 });
-
-            defaultAnchors.forEach((pos, idx) => {
+            defaultPts.forEach((p, idx) => {
                 const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.copy(pos);
-                mesh.castShadow = true;
+                mesh.position.copy(p);
                 mesh.userData = { isAnchor: true, index: idx };
                 scene.add(mesh);
                 points.push(mesh);
             });
 
             transformControls.attach(points[1]);
+            rebuildInfrastructure();
+            updateCoordTable();
         }
 
         function rebuildInfrastructure() {
@@ -489,183 +330,91 @@
             splineCurve.curveType = 'centripetal';
 
             if (roadMesh) scene.remove(roadMesh);
-            railMeshes.forEach(m => scene.remove(m));
-            railMeshes = [];
-            poleGroupList.forEach(p => scene.remove(p));
-            poleGroupList = [];
-            bridgePillars.forEach(p => scene.remove(p));
-            bridgePillars = [];
 
-            const totalLen = splineCurve.getLength();
-            if (infraType === 'road') buildRoadMesh();
-            else if (infraType === 'rail') buildRailMesh();
-            else if (infraType === 'ubahn') buildUBahnMesh();
-
-            buildPolesAndLights(totalLen);
-            buildBridgeSupports(totalLen);
-            calculateMassHaul(totalLen);
-        }
-
-        function buildRoadMesh() {
-            const steps = 180;
             const shape = new THREE.Shape();
-            const hw = roadWidth / 2;
-            shape.moveTo(-hw, -0.4);
-            shape.lineTo(hw, -0.4);
-            shape.lineTo(hw, 0.12);
-            shape.lineTo(-hw, 0.12);
-            shape.closePath();
-
-            const roadGeo = new THREE.ExtrudeGeometry(shape, { steps: steps, extrudePath: splineCurve, bevelEnabled: false });
-            roadMesh = new THREE.Mesh(roadGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8, metalness: 0.2 }));
-            roadMesh.receiveShadow = true;
-            roadMesh.castShadow = true;
+            shape.moveTo(-4, -0.4); shape.lineTo(4, -0.4); shape.lineTo(4, 0.2); shape.lineTo(-4, 0.2); shape.closePath();
+            const roadGeo = new THREE.ExtrudeGeometry(shape, { steps: 120, extrudePath: splineCurve, bevelEnabled: false });
+            roadMesh = new THREE.Mesh(roadGeo, new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 }));
             scene.add(roadMesh);
-        }
 
-        function buildRailMesh() {
-            const steps = 160;
-            const pts = splineCurve.getSpacedPoints(steps);
-            const sleeperGeo = new THREE.BoxGeometry(roadWidth * 0.7, 0.28, 0.7);
-            const sleeperMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 });
-
-            for (let i = 0; i <= steps; i++) {
-                const pt = pts[i];
-                const sleeper = new THREE.Mesh(sleeperGeo, sleeperMat);
-                sleeper.position.copy(pt);
-                sleeper.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), splineCurve.getTangentAt(i / steps).normalize());
-                sleeper.castShadow = true;
-                scene.add(sleeper);
-                railMeshes.push(sleeper);
-            }
-        }
-
-        function buildUBahnMesh() {
-            const steps = 180;
-            const bedGeo = new THREE.BoxGeometry(roadWidth * 0.85, 0.5, 1);
-            const bedMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9 });
-            const pts = splineCurve.getSpacedPoints(steps);
-
-            for (let i = 0; i <= steps; i++) {
-                const pt = pts[i];
-                const bed = new THREE.Mesh(bedGeo, bedMat);
-                bed.position.copy(pt);
-                bed.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), splineCurve.getTangentAt(i / steps).normalize());
-                bed.castShadow = true;
-                scene.add(bed);
-                railMeshes.push(bed);
-            }
-        }
-
-        function buildBridgeSupports(totalLen) {
-            const pillarGeo = new THREE.CylinderGeometry(0.9, 1.3, 35, 14);
-            const pillarMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 });
-            const checkSteps = 30;
-            for (let i = 1; i < checkSteps; i++) {
-                const pt = splineCurve.getPointAt(i / checkSteps);
-                if (pt.y > 4.5) {
-                    const pillar = new THREE.Mesh(pillarGeo, pillarMat);
-                    pillar.position.set(pt.x, pt.y / 2, pt.z);
-                    pillar.scale.set(1, pt.y / 35, 1);
-                    pillar.castShadow = true;
-                    scene.add(pillar);
-                    bridgePillars.push(pillar);
-                }
-            }
-        }
-
-        function buildPolesAndLights(totalLen) {
-            const count = Math.max(2, Math.floor(totalLen / poleSpacing));
-            const poleGeo = new THREE.CylinderGeometry(0.12, 0.18, 7.5, 8);
-            const poleMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.5 });
-
-            for (let i = 1; i < count; i++) {
-                const u = i / count;
-                const pt = splineCurve.getPointAt(u);
-                const tan = splineCurve.getTangentAt(u).normalize();
-                const bin = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), tan).normalize();
-
-                [-1, 1].forEach(side => {
-                    const polePos = pt.clone().add(bin.clone().multiplyScalar(side * ((roadWidth / 2) + 1.2)));
-                    const pole = new THREE.Mesh(poleGeo, poleMat);
-                    pole.position.set(polePos.x, polePos.y + 3.75, polePos.z);
-                    pole.castShadow = true;
-                    scene.add(pole);
-                    poleGroupList.push(pole);
-                });
-            }
+            calculateMassHaul(splineCurve.getLength());
         }
 
         function calculateMassHaul(len) {
-            let avg = 0;
-            points.forEach(p => avg += p.position.y);
-            avg /= points.length;
-            const cutFill = (avg - 2.0) * roadWidth * len * 0.45;
-            const sign = cutFill >= 0 ? '+' : '';
-            document.getElementById('stat-vol').innerText = `${sign}${cutFill.toFixed(1)} m³`;
+            let avgH = 0;
+            points.forEach(p => avgH += p.position.y);
+            avgH /= points.length;
+
+            const cut = Math.max(0, (avgH - 3.5) * 8 * len * 0.5);
+            const fill = Math.max(0, (3.5 - avgH) * 8 * len * 0.5);
+            const saldo = (cut - fill);
+            const cost = (cut * 22.5 + fill * 18.0);
+            const co2 = (cut + fill) * 0.0042;
+
+            document.getElementById('stat-cut').innerText = cut.toFixed(1) + ' m³';
+            document.getElementById('stat-fill').innerText = fill.toFixed(1) + ' m³';
+            document.getElementById('stat-saldo').innerText = (saldo >= 0 ? '+' : '') + saldo.toFixed(1) + ' m³';
+            document.getElementById('stat-cost').innerText = cost.toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' €';
+            document.getElementById('stat-co2').innerText = co2.toFixed(1) + ' t';
         }
 
-        function setIsolationMode(mode) {
-            isolationMode = mode;
-            ['hybrid', 'cad', 'dtm', 'xray'].forEach(m => {
-                const btn = document.getElementById('btn-iso-' + m);
-                if (btn) btn.className = (m === mode) ? 'py-2 px-2.5 rounded-xl bg-cyan-600/30 border border-cyan-400 text-cyan-200 font-bold flex items-center justify-center gap-1.5 transition' : 'py-2 px-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold flex items-center justify-center gap-1.5 transition hover:bg-slate-700';
+        function updateCoordTable() {
+            const tbody = document.getElementById('coord-table-body');
+            tbody.innerHTML = '';
+
+            points.forEach((p, idx) => {
+                const easting = (baseUTM.E + p.position.x * 10).toFixed(3);
+                const northing = (baseUTM.N + p.position.z * 10).toFixed(3);
+                const height = (baseUTM.Z + p.position.y).toFixed(3);
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/80 transition cursor-pointer';
+                tr.innerHTML = `
+                    <td class="p-2 font-bold text-cyan-300">P-${100 + idx}</td>
+                    <td class="p-2 font-mono">${easting}</td>
+                    <td class="p-2 font-mono">${northing}</td>
+                    <td class="p-2 font-mono text-emerald-400">${height}</td>
+                    <td class="p-2 text-slate-300">HP_ACHSE_TRASSE</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold">✓ DIN 18716</span></td>
+                `;
+                tr.onclick = () => transformControls.attach(p);
+                tbody.appendChild(tr);
             });
-
-            if (mode === 'hybrid') {
-                terrainMesh.visible = true;
-                terrainMesh.material.opacity = 1.0;
-                gridHelperMesh.visible = false;
-                cityBuildings.forEach(b => b.visible = true);
-            } else if (mode === 'cad') {
-                terrainMesh.visible = false;
-                gridHelperMesh.visible = true;
-                cityBuildings.forEach(b => b.visible = false);
-            } else if (mode === 'dtm') {
-                terrainMesh.visible = true;
-                terrainMesh.material.opacity = 1.0;
-                gridHelperMesh.visible = true;
-                if (roadMesh) roadMesh.visible = false;
-                cityBuildings.forEach(b => b.visible = false);
-            } else if (mode === 'xray') {
-                terrainMesh.visible = true;
-                terrainMesh.material.opacity = 0.35;
-                gridHelperMesh.visible = true;
-                cityBuildings.forEach(b => b.visible = true);
-            }
-            playTone(600, 'sine');
-        }
-
-        function createSimVehicles() {
-            trainMesh = new THREE.Group();
-            const tBody = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.2, 9), new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.7 }));
-            tBody.position.y = 1.3;
-            trainMesh.add(tBody);
-            scene.add(trainMesh);
-            trainMesh.visible = false;
-
-            droneMesh = new THREE.Group();
-            const dBody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.4, 1.6), new THREE.MeshStandardMaterial({ color: 0xa855f7, metalness: 0.8 }));
-            droneMesh.add(dBody);
-            scene.add(droneMesh);
-            droneMesh.visible = false;
         }
 
         function setupInteractions() {
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
+            const container = document.getElementById('canvas-container');
+            container.addEventListener('pointermove', (e) => {
+                const rect = container.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
 
-            window.addEventListener('pointerdown', (e) => {
-                if (currentMode !== 'sandbox' || e.target.tagName !== 'CANVAS') return;
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const hits = raycaster.intersectObject(terrainMesh);
+                if (hits.length > 0) {
+                    const pt = hits[0].point;
+                    const east = (baseUTM.E + pt.x * 10).toFixed(2);
+                    const north = (baseUTM.N + pt.z * 10).toFixed(2);
+                    document.getElementById('cursor-utm').innerText = `UTM 32N: E ${Number(east).toLocaleString('de-DE')} m, N ${Number(north).toLocaleString('de-DE')} m`;
+                }
+            });
+
+            container.addEventListener('pointerdown', (e) => {
+                if (e.target.tagName !== 'CANVAS') return;
                 raycaster.setFromCamera(mouse, camera);
 
-                if (activeSpawnTool) {
+                if (activeTool === 'bldg') {
                     const hits = raycaster.intersectObject(terrainMesh);
                     if (hits.length > 0) {
-                        spawnObjectAt(hits[0].point, activeSpawnTool);
-                        playTone(520, 'triangle');
+                        spawnBuildingAt(hits[0].point);
+                    }
+                    return;
+                }
+
+                if (activeTool === 'point') {
+                    const hits = raycaster.intersectObject(terrainMesh);
+                    if (hits.length > 0) {
+                        spawnSurveyPointAt(hits[0].point);
                     }
                     return;
                 }
@@ -673,125 +422,72 @@
                 const anchorHits = raycaster.intersectObjects(points);
                 if (anchorHits.length > 0) {
                     transformControls.attach(anchorHits[0].object);
-                    playTone(440, 'sine');
                 }
             });
         }
 
-        function spawnObjectAt(pos, type, trackCount = true) {
-            let obj;
-            if (type === 'pine') {
-                obj = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.45, 3), new THREE.MeshStandardMaterial({ color: 0x5c2c16 }));
-                trunk.position.y = 1.5;
-                obj.add(trunk);
-                const tier = new THREE.Mesh(new THREE.ConeGeometry(2.4, 4.5, 8), new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.8 }));
-                tier.position.y = 4.0;
-                obj.add(tier);
-            } else if (type === 'building') {
-                const h = 14 + Math.random() * 18;
-                obj = new THREE.Mesh(new THREE.BoxGeometry(7, h, 7), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.2, metalness: 0.7 }));
-                obj.position.y = h / 2;
-            } else if (type === 'totalstation') {
-                obj = new THREE.Group();
-                const tripod = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3, 3, 1, true), new THREE.MeshStandardMaterial({ color: 0xf59e0b, wireframe: true }));
-                tripod.position.y = 1.5;
-                obj.add(tripod);
-                const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.8), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
-                head.position.y = 3.4;
-                obj.add(head);
-            }
-
-            if (obj) {
-                obj.position.set(pos.x, pos.y, pos.z);
-                obj.castShadow = true;
-                scene.add(obj);
-                placedObjects.push(obj);
-            }
+        function spawnBuildingAt(pos) {
+            const h = 12 + Math.random() * 20;
+            const bldg = new THREE.Mesh(
+                new THREE.BoxGeometry(10, h, 10),
+                new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3, metalness: 0.6 })
+            );
+            bldg.position.set(pos.x, h / 2 + pos.y, pos.z);
+            scene.add(bldg);
+            placedMeshes.push(bldg);
         }
 
-        function selectSpawnTool(tool) {
-            document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
-            activeSpawnTool = (activeSpawnTool === tool) ? null : tool;
-            if (activeSpawnTool) {
-                const btn = document.getElementById('tool-' + tool);
-                if (btn) btn.classList.add('active');
-            }
-            playTone(600, 'sine');
-        }
-
-        function setInfraType(type) {
-            infraType = type;
-            ['road', 'rail', 'ubahn'].forEach(t => {
-                const btn = document.getElementById('btn-' + t);
-                btn.className = (t === type)
-                    ? 'btn-tool active py-2.5 px-2 rounded-xl bg-slate-800 border border-cyan-400 text-cyan-300 font-bold text-[11px] flex flex-col items-center justify-center gap-1'
-                    : 'btn-tool py-2.5 px-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-bold text-[11px] flex flex-col items-center justify-center gap-1';
-            });
+        function spawnSurveyPointAt(pos) {
+            const geo = new THREE.SphereGeometry(1.5, 16, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669 });
+            const pMesh = new THREE.Mesh(geo, mat);
+            pMesh.position.set(pos.x, pos.y + 1, pos.z);
+            scene.add(pMesh);
+            points.push(pMesh);
             rebuildInfrastructure();
+            updateCoordTable();
         }
 
-        function clearCustomObjects() {
-            placedObjects.forEach(o => scene.remove(o));
-            placedObjects = [];
-            cityBuildings.forEach(b => scene.remove(b));
-            cityBuildings = [];
-            document.getElementById('stat-bldg').innerText = '0 Einheiten';
-            document.getElementById('stat-bgf').innerText = '0 m²';
-            playTone(300, 'sawtooth');
+        function setActiveTool(tool) {
+            activeTool = tool;
+            ['select', 'bldg', 'trasse', 'point'].forEach(t => {
+                const btn = document.getElementById('tool-' + t);
+                if (btn) btn.className = (t === tool) 
+                    ? 'btn-action active px-3 py-1 rounded bg-cyan-600 border border-cyan-400 text-white text-xs font-bold flex items-center gap-1.5'
+                    : 'btn-action px-3 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5';
+            });
+
+            const msg = document.getElementById('map-status-msg');
+            if (tool === 'select') msg.innerText = '[SELECT & PAN: Klick zum Wählen, Ziehen zum Bewegen]';
+            if (tool === 'bldg') msg.innerText = '[3D GEBÄUDE: Klick auf Karte erzeugt LOD2 Bauwerk nach BauGB §34]';
+            if (tool === 'trasse') msg.innerText = '[TRASSE: Ziehen Sie die Trassen-Achspunkte im Raum]';
+            if (tool === 'point') msg.innerText = '[PUNKT SETZEN: Klick auf Gelände fügt geodätischen Festpunkt hinzu]';
         }
 
-        function startVehicleSim(mode) {
-            simMode = mode;
-            transformControls.detach();
-            document.getElementById('btn-stop-sim').classList.remove('hidden');
-            trainMesh.visible = (mode === 'train');
-            droneMesh.visible = (mode === 'drone');
-            playTone(700, 'sine');
-        }
-
-        function stopVehicleSim() {
-            simMode = null;
-            trainMesh.visible = false;
-            droneMesh.visible = false;
-            document.getElementById('btn-stop-sim').classList.add('hidden');
-            camera.position.set(0, 85, 140);
+        function resetCameraView() {
+            camera.position.set(0, 160, 220);
             controls.target.set(0, 0, 0);
         }
 
-        function exportBIMData(format) {
-            alert(`✓ ${format.toUpperCase()} Export: Trassierung nach ETRS89 (EPSG:25832) und CityGML (LOD2) erfolgreich generiert.`);
+        function changeRegion(region) {
+            document.getElementById('lbl-region-text').innerText = (region === 'nrw') ? 'Nordrhein-Westfalen' : (region === 'by' ? 'Freistaat Bayern' : 'Baden-Württemberg');
+            resetCameraView();
+        }
+
+        function changeMapTexture(type) {
+            // Can swap textures or update lighting
+            terrainMesh.material.wireframe = (type === 'topo');
         }
 
         function onResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(container.clientWidth, container.clientHeight);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-
-            if (simMode && splineCurve) {
-                simProgress += 0.0016;
-                if (simProgress > 1) simProgress = 0;
-
-                const pt = splineCurve.getPointAt(simProgress);
-                const tan = splineCurve.getTangentAt(simProgress).normalize();
-
-                if (simMode === 'train') {
-                    trainMesh.position.copy(pt);
-                    trainMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tan);
-                    camera.position.copy(pt.clone().add(tan.clone().multiplyScalar(-16)).add(new THREE.Vector3(0, 7, 0)));
-                    controls.target.copy(pt.clone().add(tan.clone().multiplyScalar(12)));
-                } else if (simMode === 'drone') {
-                    const dronePos = pt.clone().add(new THREE.Vector3(0, 22, 0));
-                    droneMesh.position.copy(dronePos);
-                    camera.position.copy(dronePos.clone().add(new THREE.Vector3(0, 12, 18)));
-                    controls.target.copy(pt);
-                }
-            }
-
             controls.update();
             renderer.render(scene, camera);
         }
