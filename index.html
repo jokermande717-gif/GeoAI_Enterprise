@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoAI Overworld | KI-gestützte Geodaten-, DGM- & BIM-Infrastruktur Suite</title>
+    <meta name="description" content="Automatische Punktwolken-Segmentierung, IFC 4.3 Rail/Road Alignment mit Überhöhung, REB-VB 22.013 Massenberechnung und DIN 18716 Signatur.">
+    <!-- Favicon Vector -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><polygon points='256,40 440,140 440,372 256,472 72,372 72,140' fill='%230f172a' stroke='%2338bdf8' stroke-width='24'/><line x1='256' y1='40' x2='256' y2='472' stroke='%2338bdf8' stroke-width='16'/><circle cx='256' cy='256' r='32' fill='%23ffffff'/></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            400: '#38bdf8',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            900: '#0a0f1d',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            600: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glow-effect {
+            box-shadow: 0 0 50px -10px rgba(56, 189, 248, 0.25);
+        }
+        .grid-bg {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 font-sans antialiased grid-bg selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 bg-dark-900/85 backdrop-blur-md border-b border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 flex items-center justify-center filter drop-shadow-[0_0_12px_rgba(56,189,248,0.45)]">
+                    <svg class="w-full h-full" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38bdf8" />
+                                <stop offset="50%" stop-color="#0284c7" />
+                                <stop offset="100%" stop-color="#0c4a6e" />
+                            </linearGradient>
+                            <linearGradient id="meshGradHeader" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35" />
+                                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.85" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="256,40 440,140 440,372 256,472 72,372 72,140" fill="#0f172a" stroke="url(#logoGrad)" stroke-width="16" stroke-linejoin="round" />
+                        <polygon points="256,40 256,256 72,140" fill="url(#meshGradHeader)" opacity="0.45" />
+                        <polygon points="256,40 440,140 256,256" fill="url(#meshGradHeader)" opacity="0.65" />
+                        <polygon points="72,140 256,256 72,372" fill="url(#meshGradHeader)" opacity="0.55" />
+                        <polygon points="440,140 440,372 256,256" fill="url(#meshGradHeader)" opacity="0.75" />
+                        <polygon points="72,372 256,472 256,256" fill="url(#meshGradHeader)" opacity="0.95" />
+                        <polygon points="440,372 256,472 256,256" fill="url(#meshGradHeader)" opacity="0.85" />
+                        <line x1="256" y1="40" x2="256" y2="472" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" />
+                        <line x1="72" y1="140" x2="440" y2="372" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6" opacity="0.7" />
+                        <line x1="72" y1="372" x2="440" y2="140" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6" opacity="0.7" />
+                        <circle cx="256" cy="40" r="10" fill="#38bdf8" />
+                        <circle cx="440" cy="140" r="10" fill="#38bdf8" />
+                        <circle cx="440" cy="372" r="10" fill="#38bdf8" />
+                        <circle cx="256" cy="472" r="10" fill="#38bdf8" />
+                        <circle cx="72" cy="372" r="10" fill="#38bdf8" />
+                        <circle cx="72" cy="140" r="10" fill="#38bdf8" />
+                        <circle cx="256" cy="256" r="14" fill="#ffffff" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight text-white">GeoAI <span class="text-brand-400">Overworld</span></span>
+                    <span class="block text-[10px] text-slate-400 font-mono tracking-widest uppercase">Deutschland Edition</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                <a href="#features" class="hover:text-brand-400 transition-colors">Funktionen</a>
+                <a href="#rail-alignment" class="hover:text-brand-400 transition-colors">Gleis & Überhöhung</a>
+                <a href="#standards" class="hover:text-brand-400 transition-colors">DB & REB Normen</a>
+                <a href="#pricing" class="hover:text-brand-400 transition-colors">Preise</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <a href="#trial" class="px-5 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-brand-500/20 flex items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>14 Tage testen</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-36 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-dark-700/60 border border-brand-500/30 text-brand-400 text-xs font-medium mb-8">
+                <span class="flex h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
+                Release 2026.1 | IFC 4.3 Cant (Überhöhung) & DB Ril 800 Konform
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-tight">
+                Vom Oberflächennetz zum <br class="hidden sm:inline">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-sky-300 to-sky-100">vollständigen IFC 4.3 Trassenmodell</span>
+            </h1>
+
+            <p class="mt-6 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                Automatisieren Sie die Ableitung von 3D-Bestandsachsen, Überhöhungsbändern (Cant) und Kuppenausrundungen für Straße und Schiene nach Vorgaben der <strong>DB InfraGO</strong> und des <strong>BIM Masterplans</strong>.
+            </p>
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#trial" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-base shadow-xl shadow-brand-500/25 transition-all flex items-center justify-center gap-3">
+                    <i data-lucide="hard-drive-download" class="w-5 h-5"></i>
+                    <span>Testversion anfordern</span>
+                </a>
+                <a href="#rail-alignment" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-dark-800 hover:bg-dark-700 border border-dark-600 text-slate-200 font-semibold text-base transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="compass" class="w-5 h-5 text-brand-400"></i>
+                    <span>Überhöhungs-Engine erkunden</span>
+                </a>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto border-t border-dark-700/60 pt-8 text-left">
+                <div>
+                    <div class="text-2xl font-bold text-white font-mono">IFC 4.3 Cant</div>
+                    <div class="text-xs text-slate-400 mt-1">Überhöhung & Schienenneigung</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-white font-mono">DB Ril 800</div>
+                    <div class="text-xs text-slate-400 mt-1">Trassierungsparameter berechnet</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-white font-mono">REB 22.013</div>
+                    <div class="text-xs text-slate-400 mt-1">DA45 / DA49 Datenaustausch</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-white font-mono">DIN 18716 QES</div>
+                    <div class="text-xs text-slate-400 mt-1">RSA-2048 signierte Gutachten</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW SECTION: Advanced Rail & Alignment Engine -->
+    <section id="rail-alignment" class="py-24 bg-dark-800/40 border-y border-dark-700/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-400 text-xs font-bold uppercase tracking-widest">Trassierung & Geometrische Präzision</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Berechnung von Überhöhung & Ausrundung nach DB-Standard</h2>
+                <p class="text-slate-400 mt-4 text-base">
+                    Statt manueller Punkt-für-Punkt Erfassung: Unsere KI berechnet Schienenpaare, Achsradien, Soll-Überhöhungen und Gradientenprofile vollautomatisch aus der Punktwolke.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="p-6 rounded-2xl bg-dark-800 border border-dark-700">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shrink-0">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Soll-Überhöhungsberechnung (DB Ril 800)</h3>
+                                <p class="text-slate-400 text-sm mt-1 leading-relaxed">
+                                    Automatische Berechnung des Überhöhungsmaßes <span class="font-mono text-brand-300">u = 11.8 · (V² / R)</span> und Erzeugung normkonformer Rampenübergänge für das Gleisnetz.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-dark-800 border border-dark-700">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shrink-0">
+                                <i data-lucide="git-branch" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Höhenplan & Kuppenausrundung</h3>
+                                <p class="text-slate-400 text-sm mt-1 leading-relaxed">
+                                    Mathematische Glättung von Längsgradienten und Ausrundung von Wannen und Kuppen nach bahnspezifischen Mindestausrundungsradien.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-dark-800 border border-dark-700">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shrink-0">
+                                <i data-lucide="share-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Natives IfcAlignmentCant Schema</h3>
+                                <p class="text-slate-400 text-sm mt-1 leading-relaxed">
+                                    Direkte Übergabe in OpenBIM-Trassierungssysteme (ProVI, CARD/1, Civil 3D) über die offizielle buildingSMART IFC 4.3 Infrastruktur-Spezifikation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 rounded-2xl bg-dark-900 border border-dark-700 relative overflow-hidden glow-effect font-mono text-xs">
+                    <div class="text-slate-500 border-b border-dark-700 pb-3 mb-4 flex items-center justify-between">
+                        <span>// GEOMETRIE- & TRASSIERUNGS-ENGINE</span>
+                        <span class="text-emerald-400">DB RIL 800: KONFORM</span>
+                    </div>
+                    <div class="space-y-2 text-slate-300">
+                        <div class="text-brand-400">&gt; Segmentiere Schienenpaar L/R aus Punktwolke...</div>
+                        <div>&gt; Gleisabstand ermittelt: 1435.2 mm (Regelspur)</div>
+                        <div>&gt; Kurvenradius R = 1500.0 m | Entwurfsgeschw. V = 160 km/h</div>
+                        <div class="text-sky-300">&gt; Berechnete Soll-Überhöhung u = 11.8 * (160² / 1500) = 201.4 mm -&gt; Begrenzt auf 160.0 mm</div>
+                        <div>&gt; Erzeuge IfcAlignmentHorizontal & IfcAlignmentVertical...</div>
+                        <div>&gt; Binde IfcAlignmentCantSegment (Überhöhungsrampe) ein...</div>
+                        <div class="pt-3 border-t border-dark-700 text-emerald-400 font-bold">
+                            [SUCCESS] IFC 4.3 Trassenmodell "Gleis_Bestand_mit_Cant.ifc" exportiert.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white">Vollständige Werkzeugkette für Ingenieurgeodäten</h2>
+            <p class="text-slate-400 mt-4 text-base">Entwickelt für Tiefbau, Erdmassen und Trassenplanung nach deutschen Richtlinien.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="p-8 rounded-2xl bg-dark-800 border border-dark-700 hover:border-brand-500/40 transition-all">
+                <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 mb-6">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">RandLA-Net KI-Engine</h3>
+                <p class="text-slate-400 mt-3 text-sm leading-relaxed">
+                    Lokale semantische Klassifizierung von Millionen Punkten ohne Cloud. Trennung von Bodenhorizonten, Gleiskörpern und Bauwerken.
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl bg-dark-800 border border-dark-700 hover:border-brand-500/40 transition-all">
+                <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 mb-6">
+                    <i data-lucide="calculator" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">REB-VB 22.013 Massen</h3>
+                <p class="text-slate-400 mt-3 text-sm leading-relaxed">
+                    Prüffähige Massenberechnung aus Dreiecksmaschen (TIN). Automatischer Export der amtlichen Datenaustauschformate DA45 und DA49.
+                </p>
+            </div>
+
+            <div class="p-8 rounded-2xl bg-dark-800 border border-dark-700 hover:border-brand-500/40 transition-all">
+                <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 mb-6">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">DIN 18716 RSA-Signatur</h3>
+                <p class="text-slate-400 mt-3 text-sm leading-relaxed">
+                    Erzeugt manipulationssichere Gutachtenberichte mit kryptografischer RSA-2048 Signatur und lückenlosem SQLite-Audit-Trail.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Standards & Compliance -->
+    <section id="standards" class="py-20 bg-dark-800/40 border-y border-dark-700/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="text-brand-400 text-sm font-semibold uppercase tracking-wider">Rechtssicherheit & Normen</span>
+                    <h2 class="text-3xl font-bold text-white mt-2">Vollständige Integration deutscher Bundes- und Bahnstandards</h2>
+                    <p class="text-slate-400 mt-4 text-base leading-relaxed">
+                        GeoAI Overworld ist konsequent auf den DACH-Markt zugeschnitten: Native Unterstützung aller amtlichen EPSG-Projektionen (UTM 32N/33N, Gauß-Krüger), Einbindung von <strong>basemap.de</strong> sowie Richtlinien der DB InfraGO.
+                    </p>
+                    <ul class="mt-6 space-y-3">
+                        <li class="flex items-center gap-3 text-sm text-slate-300">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-400"></i>
+                            <span>Konformität mit dem Masterplan BIM Bundesfernstraßen</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-slate-300">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-400"></i>
+                            <span>REB-VB 22.013 anerkannte Berechnungsalgorithmen (DA45/DA49)</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-slate-300">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-400"></i>
+                            <span>Hardware-gebundene Lizenzierung für 100% Datensouveränität</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-6 rounded-2xl bg-dark-900 border border-dark-700 font-mono text-xs text-slate-300 space-y-2">
+                    <div class="text-slate-500">// Audit-Trail Auszug (SQLite Audit-Engine)</div>
+                    <div class="text-brand-400">[2026-08-23 15:30] INITIALISIERE DB-TRASSEN VALIDIERUNG...</div>
+                    <div>STATUS: DGM-TIN Dreiecke: 97.889 | Abtrag: 1.050.377 m³</div>
+                    <div>REB_EXPORT: DA45/DA49 erfolgreich verifiziert.</div>
+                    <div>BIM_ENGINE: IFC 4x3 Rail Alignment (Cant u=160mm) erzeugt.</div>
+                    <div class="text-emerald-400">[SUCCESS] QES SIGNATUR: SHA256-RSA2048 VERIFIZIERT (DIN 18716)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-3xl font-bold text-white">Transparente Lizenzmodelle</h2>
+            <p class="text-slate-400 mt-3 text-base">Faire Konditionen ohne versteckte Abokosten oder Cloud-Gebühren.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Tier 1: Trial -->
+            <div class="p-8 rounded-2xl bg-dark-800 border border-dark-700 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">14-Tage Testversion</h3>
+                    <p class="text-xs text-slate-400 mt-1">Vollständiger Funktionsumfang</p>
+                    <div class="mt-6 text-4xl font-extrabold text-white">0 €</div>
+                    <ul class="mt-6 space-y-3 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Voller Zugriff auf alle KI-Module</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> REB 22.013 & IFC 4.3 Cant Alignment</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Sofortige Freischaltung per Hardware-ID</li>
+                    </ul>
+                </div>
+                <a href="#trial" class="mt-8 block text-center py-3 rounded-lg bg-dark-700 hover:bg-dark-600 text-white font-medium text-sm transition-colors">Kostenlos testen</a>
+            </div>
+
+            <!-- Tier 2: Annual (Featured) -->
+            <div class="p-8 rounded-2xl bg-dark-800 border-2 border-brand-500 relative flex flex-col justify-between glow-effect">
+                <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Empfohlen</span>
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Jahreslizenz</h3>
+                    <p class="text-xs text-slate-400 mt-1">Für Ingenieurbüros & Vermesser</p>
+                    <div class="mt-6">
+                        <span class="text-4xl font-extrabold text-white">1.490 €</span>
+                        <span class="text-slate-400 text-xs"> / Lizenz / Jahr zzgl. MwSt.</span>
+                    </div>
+                    <ul class="mt-6 space-y-3 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Unbegrenzte Trassen- & DGM-Analysen</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Inklusive aller Updates & Support</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Rechtssichere DIN 18716 Fachberichte</li>
+                    </ul>
+                </div>
+                <a href="#trial" class="mt-8 block text-center py-3 rounded-lg bg-brand-500 hover:bg-brand-400 text-white font-bold text-sm shadow-md shadow-brand-500/30 transition-all">Jetzt anfragen</a>
+            </div>
+
+            <!-- Tier 3: Lifetime -->
+            <div class="p-8 rounded-2xl bg-dark-800 border border-dark-700 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Enterprise Lifetime</h3>
+                    <p class="text-xs text-slate-400 mt-1">Dauerhafte Lizenz (Kauf)</p>
+                    <div class="mt-6">
+                        <span class="text-4xl font-extrabold text-white">2.990 €</span>
+                        <span class="text-slate-400 text-xs"> einmalig zzgl. MwSt.</span>
+                    </div>
+                    <ul class="mt-6 space-y-3 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Lebenslange Nutzungslizenz</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> 12 Monate Upgrades inklusive</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brand-400"></i> Bevorzugter Enterprise-Support</li>
+                    </ul>
+                </div>
+                <a href="#trial" class="mt-8 block text-center py-3 rounded-lg bg-dark-700 hover:bg-dark-600 text-white font-medium text-sm transition-colors">Angebot anfordern</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trial & License Activation Form -->
+    <section id="trial" class="py-24 bg-dark-800/60 border-t border-dark-700">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white">Testversion anfordern & Lizenz aktivieren</h2>
+                <p class="text-slate-400 mt-2 text-sm">Geben Sie Ihre Daten und die Hardware-ID der Software ein, um Ihren Freischaltschlüssel sofort zu erhalten.</p>
+            </div>
+
+            <div class="p-8 rounded-2xl bg-dark-900 border border-dark-700 shadow-xl">
+                <form id="licenseForm" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Firma / Büro</label>
+                            <input type="text" id="companyInput" required placeholder="z. B. Ingenieurbüro Müller GmbH" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-slate-500 focus:outline-none focus:border-brand-400 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Geschäftliche E-Mail</label>
+                            <input type="email" id="emailInput" required placeholder="kontakt@ingenieurbuero.de" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-slate-500 focus:outline-none focus:border-brand-400 text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Hardware-ID (aus der Software)</label>
+                        <input type="text" id="hwidInput" required placeholder="z. B. 4C4C4544-0051-5410-8037-B8C04F473333" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-slate-500 font-mono focus:outline-none focus:border-brand-400 text-sm">
+                        <span class="text-[11px] text-slate-500 mt-1 block">Wird beim Start von GeoAI Overlord im Aktivierungsfenster angezeigt.</span>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <input type="checkbox" required id="privacy" class="mt-1 rounded bg-dark-800 border-dark-600 text-brand-500 focus:ring-0">
+                        <label for="privacy" class="text-xs text-slate-400 leading-normal">Ich stimme der Verarbeitung meiner Daten gemäß der Datenschutzerklärung zu.</label>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold text-base shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2">
+                        <span>Lizenzschlüssel generieren & anfordern</span>
+                    </button>
+                </form>
+
+                <div id="formSuccess" class="hidden mt-6 p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-dark-700 py-12 text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <p>&copy; 2026 GeoAI Enterprise. Alle Rechte vorbehalten.</p>
+                <p class="text-xs mt-1">GeoAI Overlord – Deutschland Edition | Entwickelt für geodätische Spitzenleistung.</p>
+            </div>
+            <div class="flex items-center space-x-6 text-xs">
+                <a href="#" class="hover:text-slate-300">Impressum</a>
+                <a href="#" class="hover:text-slate-300">Datenschutzerklärung</a>
+                <a href="#" class="hover:text-slate-300">AGB & Lizenzbedingungen</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Execution -->
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('licenseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const successBox = document.getElementById('formSuccess');
+            
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="inline-block animate-spin mr-2">⟳</span> Lizenz wird signiert...`;
+
+            const payload = {
+                company: document.getElementById('companyInput').value.trim(),
+                email: document.getElementById('emailInput').value.trim(),
+                hw_id: document.getElementById('hwidInput').value.trim()
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/api/request-trial', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === "success") {
+                    successBox.className = "mt-6 p-6 rounded-xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 text-sm";
+                    successBox.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-base text-emerald-400">✓ 14-Tage Testlizenz erfolgreich aktiviert!</span>
+                                <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-md font-mono">Gültig bis: ${result.valid_until}</span>
+                            </div>
+                            <p class="text-xs text-slate-300">Kopieren Sie den folgenden Schlüssel und fügen Sie ihn im Aktivierungsdialog Ihrer Software ein:</p>
+                            <div class="relative">
+                                <textarea id="generatedKey" readonly class="w-full h-24 p-3 bg-dark-900/90 border border-emerald-500/50 rounded-lg text-xs font-mono text-emerald-200 select-all focus:outline-none">${result.license_key}</textarea>
+                                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('generatedKey').value); alert('Lizenzschlüssel kopiert!');" class="absolute top-2 right-2 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-sans transition-all">
+                                    Kopieren
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    successBox.classList.remove('hidden');
+                    this.reset();
+                } else {
+                    throw new Error(result.detail || "Serverfehler beim Generieren");
+                }
+            } catch (err) {
+                successBox.className = "mt-6 p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm";
+                successBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold">
+                        <span>ℹ Anfrage erfolgreich übermittelt</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-2">Ihre Testlizenz-Anfrage für die Hardware-ID (${payload.hw_id}) wurde registriert. Der Aktivierungsschlüssel wird per E-Mail zugestellt.</p>
+                `;
+                successBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
+        });
+    </script>
+</body>
+</html>

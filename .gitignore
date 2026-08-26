@@ -1,0 +1,10 @@
+dist/
+build/
+Output_Installer/
+*.exe
+*.bin
+__pycache__/
+*.pyc
+.geoai_license.key
+.vscode/
+.idea/

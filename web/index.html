@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoAI OVERLORD // Die weltweit 1. Sovereign Geodäsie- & AI-CAD Plattform</title>
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --bg-card: #081225;
+            --bg-glass: rgba(8, 18, 37, 0.88);
+            --cyan: #00d2ff;
+            --cyan-glow: rgba(0, 210, 255, 0.45);
+            --green: #10b981;
+            --amber: #f59e0b;
+            --purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 48px;
+            background: rgba(2, 6, 23, 0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1.5px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .brand {
+            font-family: 'Consolas', monospace;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--cyan);
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 14px var(--cyan-glow);
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .btn-download-nav {
+            background: linear-gradient(135deg, #0284c7, #00d2ff);
+            color: #020617;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 14px var(--cyan-glow);
+            transition: all 0.2s;
+        }
+        .btn-download-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 4px;
+        }
+        .toggle-btn {
+            padding: 8px 22px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.3s;
+        }
+        .toggle-btn.active {
+            background: var(--cyan);
+            color: #020617;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+        .toggle-btn.game-active {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* ========================================================= */
+        /* MODE 1: ENTERPRISE B2B SHOWCASE & GLOBE                   */
+        /* ========================================================= */
+        .hero-section {
+            padding: 55px 24px 25px;
+            text-align: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .badge-sovereign {
+            display: inline-block;
+            background: #064e3b;
+            color: #34d399;
+            border: 1px solid #059669;
+            font-family: Consolas;
+            font-size: 11.5px;
+            font-weight: bold;
+            padding: 6px 18px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .hero-title {
+            font-size: 46px;
+            font-weight: 900;
+            line-height: 1.18;
+            background: linear-gradient(135deg, #ffffff 30%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 18px;
+        }
+        .hero-desc {
+            font-size: 16.5px;
+            color: var(--text-muted);
+            max-width: 860px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        /* Direct Download CTA Banner */
+        .download-cta-box {
+            max-width: 1200px;
+            margin: 0 auto 35px;
+            background: linear-gradient(90deg, #091a38 0%, #061124 100%);
+            border: 1.5px solid var(--cyan);
+            border-radius: 12px;
+            padding: 24px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
+        }
+        .cta-left h3 {
+            color: var(--cyan);
+            font-family: Consolas;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .cta-left p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .btn-download-main {
+            background: var(--cyan);
+            color: #020617;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 900;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 20px var(--cyan-glow);
+            transition: transform 0.2s;
+        }
+        .btn-download-main:hover {
+            transform: scale(1.04);
+        }
+
+        /* Privacy & Air-Gap Banner */
+        .airgap-banner {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            background: linear-gradient(90deg, rgba(6, 78, 59, 0.4) 0%, rgba(8, 18, 37, 0.9) 100%);
+            border: 1.5px solid #059669;
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .airgap-info h4 { color: #34d399; font-family: Consolas; font-size: 15px; margin-bottom: 4px; }
+        .airgap-info p { color: var(--text-muted); font-size: 13px; }
+        .airgap-badges { display: flex; gap: 12px; font-family: Consolas; font-size: 11px; font-weight: bold; }
+        .ag-pill { background: #064e3b; color: #34d399; padding: 4px 12px; border-radius: 6px; border: 1px solid #10b981; }
+
+        /* 3D Geodetic Globe Container */
+        .globe-container {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+            position: relative;
+        }
+        .globe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background: #040914;
+            border-bottom: 1px solid var(--border);
+            font-family: Consolas;
+            font-size: 12px;
+        }
+        #globeCanvas { width: 100%; height: 540px; display: block; cursor: grab; background: #020617; }
+        #globeCanvas:active { cursor: grabbing; }
+
+        .globe-hud {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(4, 11, 26, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 30px;
+        }
+        .hud-btn {
+            background: #0f172a;
+            color: var(--text-main);
+            border: 1px solid #334155;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hud-btn.active-hud, .hud-btn:hover {
+            background: var(--cyan);
+            color: #020617;
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        /* Feature Matrix (5-Tier AI Suite) */
+        .features-section {
+            max-width: 1200px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .section-header h2 {
+            font-size: 28px;
+            font-family: Consolas;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+        .feat-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .feat-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--cyan);
+            box-shadow: 0 12px 30px rgba(0, 210, 255, 0.12);
+        }
+        .feat-icon-box {
+            font-size: 28px;
+            margin-bottom: 14px;
+            display: inline-block;
+        }
+        .feat-card h3 {
+            font-size: 17px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-family: Consolas;
+        }
+        .feat-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .feat-tag {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--cyan);
+            font-family: Consolas;
+            letter-spacing: 0.5px;
+        }
+
+        /* 14-Day Node-Locked Trial Box */
+        .trial-box {
+            background: linear-gradient(180deg, #071329 0%, #030712 100%);
+            border: 2px dashed var(--cyan);
+            border-radius: 14px;
+            padding: 36px 24px;
+            max-width: 860px;
+            margin: 0 auto 80px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 210, 255, 0.08);
+        }
+        .hwid-input {
+            width: 55%;
+            padding: 12px 18px;
+            background: #020617;
+            border: 1.5px solid #334155;
+            color: var(--cyan);
+            font-family: Consolas;
+            font-weight: 900;
+            font-size: 14px;
+            border-radius: 8px;
+            margin: 16px 10px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .hwid-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow); }
+
+        /* Pricing Section */
+        .pricing-section {
+            max-width: 1200px;
+            margin: 0 auto 90px;
+            padding: 0 24px;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 28px;
+        }
+        .price-card {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .price-card.featured {
+            border-color: var(--cyan);
+            background: linear-gradient(180deg, #081a33 0%, #050e1f 100%);
+            box-shadow: 0 0 35px rgba(0, 210, 255, 0.18);
+        }
+        .price-badge {
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: var(--cyan);
+            color: #020617;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: Consolas;
+        }
+        .price-val { font-size: 38px; font-weight: 900; margin: 14px 0; color: #fff; }
+        .price-val span { font-size: 14px; color: var(--text-muted); font-weight: normal; }
+        .feature-list { list-style: none; margin: 24px 0; font-size: 13px; color: var(--text-muted); line-height: 2.1; }
+        .feature-list li::before { content: "✓ "; color: var(--green); font-weight: bold; }
+
+        .btn-act {
+            background: #0284c7;
+            color: white;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-act:hover { background: var(--cyan); color: #020617; transform: translateY(-2px); }
+
+        /* ========================================================= */
+        /* MODE 2: GAMIFIED GEOBUILDER 3D (KIDS & CREATIVE)          */
+        /* ========================================================= */
+        .game-layout {
+            max-width: 1240px;
+            margin: 30px auto 60px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 0 24px;
+        }
+        .toolbox {
+            background: #0a0f24;
+            border: 1.5px solid var(--purple);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .tool-btn {
+            background: #141b36;
+            color: white;
+            border: 1px solid #2d3766;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover, .tool-btn.active {
+            background: var(--purple);
+            border-color: #a78bfa;
+            transform: scale(1.02);
+        }
+        .game-canvas-box {
+            background: #020617;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+        #gameCanvas { width: 100%; height: 600px; display: block; cursor: crosshair; }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 48px;
+            text-align: center;
+            font-family: Consolas;
+            font-size: 11px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <span>◬</span> GeoAI OVERLORD // 2026.1
+        </div>
+        <div class="nav-right">
+            <div class="mode-toggle">
+                <button class="toggle-btn active" id="btnModeB2B" onclick="switchMode('b2b')">🏢 Enterprise B2B Suite</button>
+                <button class="toggle-btn" id="btnModeGame" onclick="switchMode('game')">🎮 GeoBuilder 3D Sandbox</button>
+            </div>
+            <!-- GitHub Direct Release Download Link -->
+            <a href="https://github.com/your-org/geoai-overlord/releases/latest" target="_blank" class="btn-download-nav">
+                ⬇️ Download .EXE
+            </a>
+        </div>
+    </header>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 1: ENTERPRISE B2B PLATFORM & 3D GLOBE                -->
+    <!-- ========================================================= -->
+    <div id="viewB2B" class="view-section active">
+        <div class="hero-section">
+            <div class="badge-sovereign">DIE WELTWEIT 1. SOVEREIGN GEODÄSIE- & AI-CAD SUITE // STAND 2026</div>
+            <h1 class="hero-title">Sovereign 3D Geodesy & AI Infrastructure Suite</h1>
+            <p class="hero-desc">
+                Die erste revisionssichere Vermessungsplattform mit 100% lokaler Datenverarbeitung: Automatischer Massenausgleich (REB-VB 22.013), ALKIS-zu-LoD2 Generierung und gerichtsverwertbares QES-Kryptosiegel gem. § 371a ZPO ohne Datenabfluss.
+            </p>
+        </div>
+
+        <!-- Direct Download CTA Box -->
+        <div class="download-cta-box">
+            <div class="cta-left">
+                <h3>📦 OFFIZIELLER STANDALONE EXECUTABLE RELEASE</h3>
+                <p>Version 2026.1 Enterprise // Standalone .exe für Windows (64-Bit) — Keine Installation von Python nötig.</p>
+            </div>
+            <a href="https://github.com/your-org/geoai-overlord/releases/latest" target="_blank" class="btn-download-main">
+                <span>⬇️</span> GeoAI_Overlord_2026.exe Herunterladen
+            </a>
+        </div>
+
+        <!-- 100% Air-Gap Privacy Banner -->
+        <div class="airgap-banner">
+            <div class="airgap-info">
+                <h4>🛡️ 100% LOKALE DATENVERARBEITUNG // ZERO CLOUD LEAK</h4>
+                <p>Alle Berechnungen, Punktwolken-Filter und KI-Modelle laufen ausschließlich auf Ihrem Rechner. Keine Weitergabe an Cloud-Server. 100% DSGVO-konform für ÖbVI & Baukonzerne.</p>
+            </div>
+            <div class="airgap-badges">
+                <span class="ag-pill">AIR-GAP VERIFIED</span>
+                <span class="ag-pill">§ 371a ZPO</span>
+                <span class="ag-pill">DIN 18716</span>
+            </div>
+        </div>
+
+        <!-- 3D Sovereign Geodetic Globe Core -->
+        <div class="globe-container">
+            <div class="globe-header">
+                <div><span style="color:var(--cyan);">SPATIAL CORE:</span> ETRS89 / UTM 32N (BeTA2007 Matrix)</div>
+                <div><span style="color:var(--green);">DIGITAL TWIN:</span> LoD2 Structures & TIN Surface</div>
+                <div><span style="color:var(--amber);">QES SEAL:</span> RSA-2048 PSS SHA-256 (Local Enclave)</div>
+            </div>
+            <canvas id="globeCanvas"></canvas>
+            <div class="globe-hud">
+                <button class="hud-btn active-hud" id="btnH1" onclick="setGlobeMode('globe', this)">🌐 3D Wireframe Globe</button>
+                <button class="hud-btn" id="btnH2" onclick="setGlobeMode('mesh', this)">📐 TIN Triangulation Mesh</button>
+                <button class="hud-btn" id="btnH3" onclick="setGlobeMode('buildings', this)">🏢 LoD2 City Model</button>
+            </div>
+        </div>
+
+        <!-- 5-Tier AI Architecture & Services Matrix -->
+        <div class="features-section">
+            <div class="section-header">
+                <h2>DIE 5-STUFIGE KI-INTELLIGENZ-MATRIX</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Pioniertechnologie für Baukonzerne, Ingenieurbüros und Landesvermessungsämter</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feat-card">
+                    <div class="feat-icon-box">⚡</div>
+                    <h3>1. AI Mass-Haul Optimizer</h3>
+                    <p>Optimiert automatisch Gradienten und Trassenhöhenpläne, sodass der Massensaldo minimiert und Tausende Liter Baufahrzeug-Diesel eingespart werden.</p>
+                    <div class="feat-tag">REB-VB 22.013 // DIESEL-SAVER</div>
+                </div>
+
+                <div class="feat-card">
+                    <div class="feat-icon-box">🏢</div>
+                    <h3>2. 2D ALKIS to 3D LoD2 Extruder</h3>
+                    <p>Wandelt flache 2D-Katasterkarten und Flurstücke mit KI-Erkennung vollautomatisch in maßhaltige 3D-Baukörper mit Dachneigung um.</p>
+                    <div class="feat-tag">ALKIS COMPLIANT // LoD2 3D</div>
+                </div>
+
+                <div class="feat-card">
+                    <div class="feat-icon-box">📉</div>
+                    <h3>3. Subsidence & Deformation Predictor</h3>
+                    <p>Sub-Millimeter-Prädiktion von Bodenbewegungen, Tunneldeformationen und Hangrutschungen aus LiDAR- und Tachymeter-Zeitreihen.</p>
+                    <div class="feat-tag">3σ MAHALANOBIS // SUB-MM</div>
+                </div>
+
+                <div class="feat-card">
+                    <div class="feat-icon-box">📝</div>
+                    <h3>4. Semantic VOB/C & GAEB BoQ Engine</h3>
+                    <p>Generiert rechtssichere Leistungsverzeichnisse (GAEB DA XML 3.2 / DIN 18300) direkt aus den berechneten Erdmassen- und Bodenklassen.</p>
+                    <div class="feat-tag">GAEB X83 // VOB/C DA45</div>
+                </div>
+
+                <div class="feat-card">
+                    <div class="feat-icon-box">⚖️</div>
+                    <h3>5. BauGB §34 & Abstandsflächen-Audit</h3>
+                    <p>Prüft 3D-Baukörper in Echtzeit auf Grenzabschnittstiefen, Abstandsflächen und Höhenbeschränkungen vor der behördlichen Einreichung.</p>
+                    <div class="feat-tag">BauGB §34 // LBO AUDIT</div>
+                </div>
+
+                <div class="feat-card">
+                    <div class="feat-icon-box">🔒</div>
+                    <h3>6. Sovereign QES Cryptographic Vault</h3>
+                    <p>Kryptographische Verankerung mittels Merkle Tree und Hardware-gebundenem RSA-2048 Schlüssel zur lückenlosen Beweisführung gem. § 371a ZPO.</p>
+                    <div class="feat-tag">DIN 18716 // REVISIONSFEST</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14-Day Node-Locked Trial Box -->
+        <div class="trial-box">
+            <h3 style="color:var(--cyan); font-family:Consolas; font-size:20px; margin-bottom:8px;">⚡ 14-TAGE TESTLIZENZ SOFORT FREISCHALTEN</h3>
+            <p style="font-size:14px; color:var(--text-muted); max-width:680px; margin:0 auto;">
+                Geben Sie Ihre 16-stellige Hardware Enclave ID (HWID) aus der Desktop-App ein, um Ihren kryptographischen 14-Tage Vollzugang zu generieren.
+            </p>
+            <input type="text" id="hwidInput" class="hwid-input" placeholder="HWID eingeben (z.B. 00B9C6E0A6FEBC10)" maxlength="16">
+            <br>
+            <button class="btn-act" style="width:auto; padding:12px 32px;" onclick="generateTrialKey()">🔑 14-Tage Lizenz Berechnen</button>
+            <div id="keyOutput" style="margin-top:18px; font-family:Consolas; font-weight:bold; color:var(--green); font-size:16px;"></div>
+        </div>
+
+        <!-- Enterprise B2B Pricing Matrix -->
+        <div class="pricing-section">
+            <div class="section-header">
+                <h2>UNTERNEHMENS-LIZENZEN & PRICING</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Transparente Lizenzierungsmodelle für Ingenieurbüros und Konzerne</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <div>
+                        <h3 style="color:var(--cyan); font-family:Consolas;">COMMERCIAL PILOT</h3>
+                        <div class="price-val">0 € <span>/ 14 Tage</span></div>
+                        <p style="font-size:13px; color:var(--text-muted);">Vollumfänglicher Testzugang für Vermessungsbüros zur Evaluierung.</p>
+                        <ul class="feature-list">
+                            <li>5-Tier AI Suite & Mass-Haul Optimizer</li>
+                            <li>Amtliche DA45 & GAEB X83 Exporte</li>
+                            <li>DIN 18716 PDF Prüfgutachten</li>
+                            <li>Node-Locked HWID Bindung</li>
+                        </ul>
+                    </div>
+                    <button class="btn-act" onclick="document.querySelector('.trial-box').scrollIntoView({behavior:'smooth'})">Kostenlos Starten</button>
+                </div>
+
+                <div class="price-card featured">
+                    <div class="price-badge">BELIEBTESTE WAHL</div>
+                    <div>
+                        <h3 style="color:var(--cyan); font-family:Consolas;">PROFESSIONAL CAD</h3>
+                        <div class="price-val">4.850 € <span>/ Jahr pro Node</span></div>
+                        <p style="font-size:13px; color:var(--text-muted);">Für Ingenieurbüros, Trassenplaner und Generalunternehmer.</p>
+                        <ul class="feature-list">
+                            <li>Alle Funktionen der Pilot-Version</li>
+                            <li>Unbegrenzte AI Punktwolken-Klassifizierung</li>
+                            <li>ALKIS-zu-3D LoD2 Gebäude-Generator</li>
+                            <li>Automatisierte AI Rechnungsprüfung</li>
+                            <li>24/7 Priority Support & BeTA2007 Updates</li>
+                        </ul>
+                    </div>
+                    <button class="btn-act" style="background:var(--cyan); color:#020617;" onclick="alert('Ihre Bestellung für Professional CAD wird vorbereitet.')">Lizenz Bestellen</button>
+                </div>
+
+                <div class="price-card">
+                    <div>
+                        <h3 style="color:var(--cyan); font-family:Consolas;">SOVEREIGN ENTERPRISE</h3>
+                        <div class="price-val">Individuell</div>
+                        <p style="font-size:13px; color:var(--text-muted);">Für Baukonzerne, Infrastrukturbetreiber und Landesbehörden.</p>
+                        <ul class="feature-list">
+                            <li>Unbegrenzte Floating Lizenzen</li>
+                            <li>On-Premise Air-Gap Deployment</li>
+                            <li>Custom AI Training auf eigene Katasterdaten</li>
+                            <li>Dedizierter Integrationsingenieur</li>
+                        </ul>
+                    </div>
+                    <button class="btn-act" onclick="alert('Unser Enterprise-Team meldet sich innerhalb von 2 Stunden bei Ihnen.')">Vertrieb Kontaktieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 2: GAMIFIED GEOBUILDER 3D (KIDS & CREATIVE)          -->
+    <!-- ========================================================= -->
+    <div id="viewGame" class="view-section">
+        <div class="hero-section" style="padding-bottom:10px;">
+            <h1 class="hero-title" style="background: linear-gradient(135deg, #ffffff, var(--purple)); -webkit-background-clip:text;">
+                🎮 GeoBuilder 3D // Entdecke die Welt der Geodäsie!
+            </h1>
+            <p class="hero-desc">Wähle Werkzeuge aus dem Baukasten, baue deine eigene Stadt, verlege Gleise und lass Züge fahren!</p>
+        </div>
+
+        <div class="game-layout">
+            <div class="toolbox">
+                <h4 style="color:#c4b5fd; font-family:Consolas; margin-bottom:6px;">🏗️ BAUKASTEN</h4>
+                <button class="tool-btn active" onclick="setGameTool('skyscraper')">🏢 Wolkenkratzer</button>
+                <button class="tool-btn" onclick="setGameTool('house')">🏡 Wohnhaus</button>
+                <button class="tool-btn" onclick="setGameTool('track')">🛤️ Eisenbahnschiene</button>
+                <button class="tool-btn" onclick="setGameTool('tree')">🌳 Stadtpark / Baum</button>
+                <button class="tool-btn" onclick="setGameTool('train')">🚆 Express-Zug setzen</button>
+                <hr style="border-color:#2d3766; margin:6px 0;">
+                <button class="tool-btn" style="background:#ef4444; border-color:#f87171;" onclick="clearGameCanvas()">🗑️ Stadt leeren</button>
+            </div>
+
+            <div class="game-canvas-box">
+                <div style="position:absolute; top:16px; left:16px; background:rgba(10, 15, 36, 0.85); padding:10px 18px; border-radius:20px; border:1px solid var(--purple); font-family:Consolas; font-size:13px; color:#c4b5fd;">
+                    🏆 Rang: <span id="gameRank" style="color:var(--cyan); font-weight:bold;">Junior Vermesser</span> | Objekte: <span id="gameObjCount" style="color:var(--green); font-weight:bold;">0</span>
+                </div>
+                <canvas id="gameCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 GeoAI Overlord Enterprise // German Geodetic Engineering Standards. Fully Compliant with VOB/C, DIN 18716 & REB-VB 22.013.
+    </footer>
+
+    <script>
+        // Mode Switcher
+        function switchMode(mode) {
+            const isB2B = mode === 'b2b';
+            document.getElementById('viewB2B').classList.toggle('active', isB2B);
+            document.getElementById('viewGame').classList.toggle('active', !isB2B);
+            
+            document.getElementById('btnModeB2B').className = 'toggle-btn ' + (isB2B ? 'active' : '');
+            document.getElementById('btnModeGame').className = 'toggle-btn ' + (!isB2B ? 'game-active' : '');
+
+            if (isB2B) { resizeGlobe(); } else { resizeGame(); }
+        }
+
+        // 14-Day Node-Locked Trial Generator
+        function generateTrialKey() {
+            const hwid = document.getElementById('hwidInput').value.trim().toUpperCase();
+            if (hwid.length < 8) {
+                alert('Bitte geben Sie eine gültige Hardware-ID mit mindestens 8 Zeichen ein.');
+                return;
+            }
+            let hash = 0;
+            for (let i = 0; i < hwid.length; i++) {
+                hash = ((hash << 5) - hash) + hwid.charCodeAt(i);
+                hash |= 0;
+            }
+            const cleanHash = Math.abs(hash).toString(16).toUpperCase().padStart(8, 'F');
+            const key = `GEOAI-${hwid.substring(0,4)}-TRIAL-${cleanHash.substring(0,4)}-${cleanHash.substring(4,8)}`;
+            document.getElementById('keyOutput').innerText = `✓ Ihr 14-Tage Lizenzschlüssel: ${key}`;
+        }
+
+        // =========================================================
+        // 3D Geodetic Globe Core (Orbits, Concentric ◬, Glow)
+        // =========================================================
+        const globeCanvas = document.getElementById('globeCanvas');
+        const gCtx = globeCanvas.getContext('2d');
+        let currentMode = 'globe';
+        let yaw = 0, pitch = 20;
+        let animAngle = 0;
+        let isDragging = false, lastX, lastY;
+
+        function setGlobeMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active-hud'));
+            btn.classList.add('active-hud');
+            renderGlobe();
+        }
+
+        function resizeGlobe() {
+            globeCanvas.width = globeCanvas.parentElement.clientWidth;
+            globeCanvas.height = 540;
+            renderGlobe();
+        }
+        window.addEventListener('resize', resizeGlobe);
+
+        function project3D(x, y, z) {
+            const radYaw = yaw * Math.PI / 180;
+            const radPitch = pitch * Math.PI / 180;
+            const rx = x * Math.cos(radYaw) - y * Math.sin(radYaw);
+            const ry = x * Math.sin(radYaw) + y * Math.cos(radYaw);
+            return {
+                x: globeCanvas.width / 2 + rx,
+                y: globeCanvas.height / 2 + ry * Math.sin(radPitch) - z * Math.cos(radPitch)
+            };
+        }
+
+        function renderGlobe() {
+            gCtx.fillStyle = "#020617";
+            gCtx.fillRect(0, 0, globeCanvas.width, globeCanvas.height);
+
+            if (currentMode === 'globe') {
+                const radius = 175;
+
+                // 1. Orbital Ring 1
+                gCtx.save();
+                gCtx.strokeStyle = "rgba(0, 210, 255, 0.4)";
+                gCtx.lineWidth = 1.8;
+                gCtx.beginPath();
+                for (let a = 0; a <= 360; a += 6) {
+                    const rad = a * Math.PI / 180;
+                    const ox = Math.cos(rad) * (radius + 45);
+                    const oy = Math.sin(rad) * (radius + 45);
+                    const oz = Math.sin(rad + animAngle) * 45;
+                    const p = project3D(ox, oy, oz);
+                    if (a === 0) gCtx.moveTo(p.x, p.y); else gCtx.lineTo(p.x, p.y);
+                }
+                gCtx.closePath();
+                gCtx.stroke();
+
+                const sat1 = project3D(Math.cos(animAngle) * (radius + 45), Math.sin(animAngle) * (radius + 45), Math.sin(animAngle*2) * 45);
+                gCtx.fillStyle = "#00d2ff";
+                gCtx.shadowColor = "#00d2ff";
+                gCtx.shadowBlur = 15;
+                gCtx.beginPath(); gCtx.arc(sat1.x, sat1.y, 5, 0, Math.PI * 2); gCtx.fill();
+                gCtx.restore();
+
+                // 2. Orbital Ring 2
+                gCtx.save();
+                gCtx.strokeStyle = "rgba(16, 185, 129, 0.35)";
+                gCtx.lineWidth = 1.4;
+                gCtx.beginPath();
+                for (let a = 0; a <= 360; a += 6) {
+                    const rad = a * Math.PI / 180;
+                    const ox = Math.sin(rad) * 35;
+                    const oy = Math.cos(rad) * (radius + 50);
+                    const oz = Math.sin(rad) * (radius + 50);
+                    const p = project3D(ox, oy, oz);
+                    if (a === 0) gCtx.moveTo(p.x, p.y); else gCtx.lineTo(p.x, p.y);
+                }
+                gCtx.closePath();
+                gCtx.stroke();
+
+                const sat2 = project3D(Math.sin(-animAngle) * 35, Math.cos(-animAngle) * (radius + 50), Math.sin(-animAngle) * (radius + 50));
+                gCtx.fillStyle = "#10b981";
+                gCtx.shadowColor = "#10b981";
+                gCtx.shadowBlur = 15;
+                gCtx.beginPath(); gCtx.arc(sat2.x, sat2.y, 4.5, 0, Math.PI * 2); gCtx.fill();
+                gCtx.restore();
+
+                // 3. Globe Longitude & Latitude Wireframe
+                gCtx.strokeStyle = "rgba(0, 210, 255, 0.22)";
+                gCtx.lineWidth = 1;
+
+                for (let lat = -60; lat <= 60; lat += 30) {
+                    const rLat = radius * Math.cos(lat * Math.PI / 180);
+                    const zLat = radius * Math.sin(lat * Math.PI / 180);
+                    gCtx.beginPath();
+                    for (let lon = 0; lon <= 360; lon += 10) {
+                        const x = rLat * Math.cos(lon * Math.PI / 180);
+                        const y = rLat * Math.sin(lon * Math.PI / 180);
+                        const p = project3D(x, y, zLat);
+                        if (lon === 0) gCtx.moveTo(p.x, p.y); else gCtx.lineTo(p.x, p.y);
+                    }
+                    gCtx.stroke();
+                }
+
+                for (let lon = 0; lon < 360; lon += 30) {
+                    gCtx.beginPath();
+                    for (let lat = -90; lat <= 90; lat += 10) {
+                        const x = radius * Math.cos(lat * Math.PI / 180) * Math.cos(lon * Math.PI / 180);
+                        const y = radius * Math.cos(lat * Math.PI / 180) * Math.sin(lon * Math.PI / 180);
+                        const z = radius * Math.sin(lat * Math.PI / 180);
+                        const p = project3D(x, y, z);
+                        if (lat === -90) gCtx.moveTo(p.x, p.y); else gCtx.lineTo(p.x, p.y);
+                    }
+                    gCtx.stroke();
+                }
+
+                // 4. Concentric Nested Geodetic Triangles (◬ Core) & Central Anchor
+                const center = project3D(0, 0, 0);
+                const outerSize = 75 + Math.sin(animAngle * 2) * 3;
+                const innerSize = outerSize * 0.52;
+
+                gCtx.save();
+                gCtx.shadowColor = "#00d2ff";
+                gCtx.shadowBlur = 24;
+
+                // Outer Triangle
+                gCtx.strokeStyle = "rgba(0, 210, 255, 0.95)";
+                gCtx.lineWidth = 2.6;
+                gCtx.beginPath();
+                gCtx.moveTo(center.x, center.y - outerSize);
+                gCtx.lineTo(center.x - outerSize * 0.866, center.y + outerSize * 0.5);
+                gCtx.lineTo(center.x + outerSize * 0.866, center.y + outerSize * 0.5);
+                gCtx.closePath();
+                gCtx.stroke();
+
+                // Inner Triangle
+                gCtx.strokeStyle = "rgba(56, 189, 248, 0.85)";
+                gCtx.lineWidth = 2.0;
+                gCtx.beginPath();
+                gCtx.moveTo(center.x, center.y - innerSize);
+                gCtx.lineTo(center.x - innerSize * 0.866, center.y + innerSize * 0.5);
+                gCtx.lineTo(center.x + innerSize * 0.866, center.y + innerSize * 0.5);
+                gCtx.closePath();
+                gCtx.stroke();
+
+                // Central Benchmark Dot
+                const pulseR = 5 + Math.sin(animAngle * 3.5) * 2;
+                gCtx.fillStyle = "#ffffff";
+                gCtx.beginPath();
+                gCtx.arc(center.x, center.y, pulseR, 0, Math.PI * 2);
+                gCtx.fill();
+
+                gCtx.strokeStyle = "#00d2ff";
+                gCtx.lineWidth = 2;
+                gCtx.beginPath();
+                gCtx.arc(center.x, center.y, pulseR + 5, 0, Math.PI * 2);
+                gCtx.stroke();
+
+                gCtx.font = "bold 13px Consolas";
+                gCtx.fillStyle = "#00d2ff";
+                gCtx.textAlign = "center";
+                gCtx.fillText("◬ GeoAI SOVEREIGN CORE", center.x, center.y + outerSize + 30);
+                gCtx.restore();
+
+            } else if (currentMode === 'mesh') {
+                gCtx.strokeStyle = "#00d2ff";
+                gCtx.lineWidth = 1.2;
+                const step = 45;
+                for (let x = -200; x < 200; x += step) {
+                    for (let y = -200; y < 200; y += step) {
+                        const z1 = Math.sin(x * 0.03) * Math.cos(y * 0.03) * 35;
+                        const z2 = Math.sin((x+step) * 0.03) * Math.cos(y * 0.03) * 35;
+                        const z3 = Math.sin((x+step) * 0.03) * Math.cos((y+step) * 0.03) * 35;
+                        const z4 = Math.sin(x * 0.03) * Math.cos((y+step) * 0.03) * 35;
+
+                        const p1 = project3D(x, y, z1); const p2 = project3D(x + step, y, z2);
+                        const p3 = project3D(x + step, y + step, z3); const p4 = project3D(x, y + step, z4);
+
+                        gCtx.fillStyle = "rgba(14, 165, 233, 0.15)";
+                        gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y); gCtx.lineTo(p3.x, p3.y); gCtx.closePath();
+                        gCtx.fill(); gCtx.stroke();
+
+                        gCtx.fillStyle = "rgba(16, 185, 129, 0.15)";
+                        gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p3.x, p3.y); gCtx.lineTo(p4.x, p4.y); gCtx.closePath();
+                        gCtx.fill(); gCtx.stroke();
+                    }
+                }
+
+            } else if (currentMode === 'buildings') {
+                const blds = [
+                    { pts: [[-120, -80], [-40, -80], [-40, -20], [-120, -20]], h: 70 },
+                    { pts: [[40, -100], [140, -100], [140, -20], [40, -20]], h: 95 },
+                    { pts: [[-140, 40], [-60, 40], [-60, 110], [-140, 110]], h: 50 },
+                    { pts: [[30, 40], [150, 40], [150, 120], [30, 120]], h: 60 }
+                ];
+
+                blds.forEach(b => {
+                    gCtx.fillStyle = "rgba(14, 165, 233, 0.4)";
+                    gCtx.strokeStyle = "#0284c7";
+                    for (let i = 0; i < b.pts.length; i++) {
+                        const pCurr = b.pts[i]; const pNext = b.pts[(i + 1) % b.pts.length];
+                        const b1 = project3D(pCurr[0], pCurr[1], 0); const b2 = project3D(pNext[0], pNext[1], 0);
+                        const t2 = project3D(pNext[0], pNext[1], b.h); const t1 = project3D(pCurr[0], pCurr[1], b.h);
+                        gCtx.beginPath(); gCtx.moveTo(b1.x, b1.y); gCtx.lineTo(b2.x, b2.y);
+                        gCtx.lineTo(t2.x, t2.y); gCtx.lineTo(t1.x, t1.y); gCtx.closePath();
+                        gCtx.fill(); gCtx.stroke();
+                    }
+                    gCtx.fillStyle = "rgba(56, 189, 248, 0.8)";
+                    gCtx.strokeStyle = "#38bdf8";
+                    gCtx.beginPath();
+                    const r0 = project3D(b.pts[0][0], b.pts[0][1], b.h);
+                    gCtx.moveTo(r0.x, r0.y);
+                    for (let i = 1; i < b.pts.length; i++) {
+                        const pt = project3D(b.pts[i][0], b.pts[i][1], b.h);
+                        gCtx.lineTo(pt.x, pt.y);
+                    }
+                    gCtx.closePath(); gCtx.fill(); gCtx.stroke();
+                });
+            }
+        }
+
+        // Mouse Drag Orbit
+        globeCanvas.addEventListener('mousedown', e => { isDragging = true; lastX = e.clientX; lastY = e.clientY; });
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            yaw = (yaw + (e.clientX - lastX) * 0.5) % 360;
+            pitch = Math.max(-60, Math.min(80, pitch - (e.clientY - lastY) * 0.4));
+            lastX = e.clientX; lastY = e.clientY;
+            renderGlobe();
+        });
+
+        // Continuous Smooth Animation Loop
+        function animate() {
+            animAngle += 0.025;
+            if (!isDragging && currentMode === 'globe') {
+                yaw = (yaw + 0.35) % 360;
+            }
+            renderGlobe();
+            requestAnimationFrame(animate);
+        }
+
+        // =========================================================
+        // GeoBuilder 3D Sandbox Game Engine
+        // =========================================================
+        const gameCanvas = document.getElementById('gameCanvas');
+        const gameCtx = gameCanvas.getContext('2d');
+        let activeTool = 'skyscraper';
+        let gameObjects = [];
+
+        function setGameTool(tool) {
+            activeTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function resizeGame() {
+            gameCanvas.width = gameCanvas.parentElement.clientWidth;
+            gameCanvas.height = 600;
+            renderGame();
+        }
+
+        gameCanvas.addEventListener('click', (e) => {
+            const rect = gameCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - gameCanvas.width / 2;
+            const y = e.clientY - rect.top - gameCanvas.height / 2;
+
+            gameObjects.push({ type: activeTool, x: x, y: y });
+            updateGameScore();
+            renderGame();
+        });
+
+        function clearGameCanvas() {
+            gameObjects = [];
+            updateGameScore();
+            renderGame();
+        }
+
+        function updateGameScore() {
+            const count = gameObjects.length;
+            document.getElementById('gameObjCount').innerText = count;
+            const rank = count > 15 ? 'Meister Geodät 🏆' : (count > 7 ? 'Stadtarchitekt 📐' : 'Junior Vermesser 📍');
+            document.getElementById('gameRank').innerText = rank;
+        }
+
+        function renderGame() {
+            gameCtx.fillStyle = "#030712";
+            gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            const cx = gameCanvas.width / 2;
+            const cy = gameCanvas.height / 2;
+
+            gameCtx.strokeStyle = "#141b36";
+            for (let i = -400; i <= 400; i += 30) {
+                gameCtx.beginPath();
+                gameCtx.moveTo(cx + i - 200, cy - 200); gameCtx.lineTo(cx + i + 200, cy + 200);
+                gameCtx.stroke();
+                gameCtx.beginPath();
+                gameCtx.moveTo(cx - 200, cy + i - 200); gameCtx.lineTo(cx + 200, cy + i + 200);
+                gameCtx.stroke();
+            }
+
+            gameObjects.forEach(obj => {
+                const px = cx + obj.x;
+                const py = cy + obj.y;
+
+                if (obj.type === 'skyscraper') {
+                    gameCtx.fillStyle = "#0ea5e9";
+                    gameCtx.fillRect(px - 15, py - 45, 30, 45);
+                    gameCtx.fillStyle = "#38bdf8";
+                    gameCtx.fillRect(px - 15, py - 50, 30, 8);
+                } else if (obj.type === 'house') {
+                    gameCtx.fillStyle = "#f59e0b";
+                    gameCtx.fillRect(px - 12, py - 18, 24, 18);
+                    gameCtx.fillStyle = "#ef4444";
+                    gameCtx.beginPath();
+                    gameCtx.moveTo(px - 15, py - 18); gameCtx.lineTo(px, py - 30); gameCtx.lineTo(px + 15, py - 18);
+                    gameCtx.fill();
+                } else if (obj.type === 'track') {
+                    gameCtx.strokeStyle = "#94a3b8";
+                    gameCtx.lineWidth = 4;
+                    gameCtx.beginPath(); gameCtx.moveTo(px - 25, py); gameCtx.lineTo(px + 25, py); gameCtx.stroke();
+                    gameCtx.lineWidth = 1;
+                } else if (obj.type === 'tree') {
+                    gameCtx.fillStyle = "#10b981";
+                    gameCtx.beginPath(); gameCtx.arc(px, py - 14, 12, 0, Math.PI * 2); gameCtx.fill();
+                    gameCtx.fillStyle = "#78350f";
+                    gameCtx.fillRect(px - 2, py - 4, 4, 8);
+                } else if (obj.type === 'train') {
+                    gameCtx.fillStyle = "#dc2626";
+                    gameCtx.fillRect(px - 20, py - 12, 40, 12);
+                    gameCtx.fillStyle = "#fef08a";
+                    gameCtx.fillRect(px + 14, py - 10, 4, 4);
+                }
+            });
+        }
+
+        // Initialize & Launch Continuous Loop
+        resizeGlobe();
+        animate();
+    </script>
+</body>
+</html>

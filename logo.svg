@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="geoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0c4a6e" />
+    </linearGradient>
+    <linearGradient id="meshGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.85" />
+    </linearGradient>
+  </defs>
+  <polygon points="256,40 440,140 440,372 256,472 72,372 72,140" fill="#0f172a" stroke="url(#geoGrad)" stroke-width="14" stroke-linejoin="round" />
+  <polygon points="256,40 256,256 72,140" fill="url(#meshGrad)" opacity="0.4" />
+  <polygon points="256,40 440,140 256,256" fill="url(#meshGrad)" opacity="0.6" />
+  <polygon points="72,140 256,256 72,372" fill="url(#meshGrad)" opacity="0.5" />
+  <polygon points="440,140 440,372 256,256" fill="url(#meshGrad)" opacity="0.7" />
+  <polygon points="72,372 256,472 256,256" fill="url(#meshGrad)" opacity="0.9" />
+  <polygon points="440,372 256,472 256,256" fill="url(#meshGrad)" opacity="0.8" />
+  <line x1="256" y1="40" x2="256" y2="472" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" />
+  <line x1="72" y1="140" x2="440" y2="372" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6" opacity="0.7" />
+  <line x1="72" y1="372" x2="440" y2="140" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6" opacity="0.7" />
+  <circle cx="256" cy="40" r="10" fill="#38bdf8" />
+  <circle cx="440" cy="140" r="10" fill="#38bdf8" />
+  <circle cx="440" cy="372" r="10" fill="#38bdf8" />
+  <circle cx="256" cy="472" r="10" fill="#38bdf8" />
+  <circle cx="72" cy="372" r="10" fill="#38bdf8" />
+  <circle cx="72" cy="140" r="10" fill="#38bdf8" />
+  <circle cx="256" cy="256" r="14" fill="#ffffff" />
+</svg>
